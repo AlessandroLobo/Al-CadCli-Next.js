@@ -52,6 +52,29 @@ export const Form = styled(Box, {
   },
 })
 
+export const TextInput = styled('input', {
+  backgroundColor: 'transparent !important',
+  border: 'none',
+  borderBottom: '1px solid #333',
+  color: '#333',
+
+  '&:-webkit-autofill, &:-internal-autofill-selected': {
+    backgroundColor: 'transparent !important',
+  },
+
+  '&::placeholder': {
+    color: '#333',
+  },
+
+  '& input:-webkit-autofill': {
+    '-webkit-box-shadow': '0 0 0 30px white inset !important',
+    '-webkit-text-fill-color': '#333 !important',
+  },
+
+});
+
+
+
 export const ButtonContainer = styled('div', {
   padding: '30px',
   display: 'flex',
@@ -79,6 +102,36 @@ export const SocialButton = styled('button', {
   },
 })
 
-export const FormError = styled(Text, {
-  color: '#f75a68',
+export const ShowPasswordButton = styled('div', {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '40px',
+  padding: '0 16px',
+  backgroundColor: 'transparent',
+  color: '$gray400',
+  marginTop: '8px',
+  borderRadius: '4px',
+  border: '1px solid $gray400',
+  fontSize: '14px',
+  fontWeight: '500',
+  cursor: 'pointer',
+
+  '&:hover': {
+    color: '$gray100',
+    backgroundColor: '$gray500'
+  },
+
+  '&.active': {
+    backgroundColor: '$gray500',
+    color: '$gray100'
+  }
+});
+
+export const FormError = styled('div', {
+
+
+  [`${Text}`]: {
+    color: '$gray400'
+  }
 })
