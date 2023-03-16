@@ -133,5 +133,9 @@ export const FormError = styled('div', {
 
   [`${Text}`]: {
     color: '$gray400'
+  },
+  span: {
+    color: '#FF4136'
   }
+
 })
