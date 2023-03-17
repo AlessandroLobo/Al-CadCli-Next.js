@@ -118,8 +118,8 @@ export const ShowPasswordButton = styled('div', {
   cursor: 'pointer',
 
   '&:hover': {
-    color: '$gray100',
-    backgroundColor: '$gray500'
+    backgroundColor: '$ignite500',
+    color: '#ffffff',
   },
 
   '&.active': {

@@ -17,12 +17,12 @@ import {
   faGoogle,
   faLinkedin,
 } from '@fortawesome/free-brands-svg-icons';
-import { useSession, getSession, signIn } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
 import { GetServerSideProps } from 'next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 const claimUserNameFormshema = z.object({
@@ -47,18 +47,13 @@ function Login() {
     resolver: zodResolver(claimUserNameFormshema)
   });
 
-  const [count, setCount] = useState(0);
-  const [handle, setHandle] = useState(0)
-
-  const { data: session } = useSession()
-
   async function handleClaimUsername(data: ClaimUserNameFormData | null | undefined) {
     const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
 
     if (!data) return;
     const result = await signIn('credentials', { ...data, redirect: false });
     if (result?.error) {
-      setLoginError('Email ou senhas invalidas');
+      setLoginError('Usuário ou senha incorretos!');
       if (passwordInput) {
         passwordInput.value = '';
       }
@@ -70,7 +65,7 @@ function Login() {
       console.log('Deu certo');
       router.push('/');
     } else {
-      alert('Senha ou email invalidos')
+      setLoginError('Usuário ou senha incorretos!');
       console.log('Não deu certo');
 
     }
@@ -88,7 +83,7 @@ function Login() {
             <TextInput placeholder="Enter your Email" {...register('email')} />
             <FormError >
               <Text>
-                {errors.email ? errors.email?.message : 'Digite um email'}
+                {errors.email ? errors.email?.message : ''}
               </Text>
             </FormError>
           </label>
@@ -97,16 +92,16 @@ function Login() {
             <TextInput id='password' type={showPassword ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} autoComplete="new-password" />
             <FormError>
               <Text>
-                {errors.password ? errors.password?.message : 'Digite uma senha'}
+                {errors.password ? errors.password?.message : ''}
                 {loginError && <><br /><span>{loginError}</span></>}
                 {error && <><br /><span>{error}</span></>}
               </Text>
-              <ShowPasswordButton onClick={() => setShowPassword(!showPassword)} >Mostrar senha</ShowPasswordButton>
+              <ShowPasswordButton onClick={() => setShowPassword(!showPassword)} >Show password</ShowPasswordButton>
             </FormError>
 
           </label>
           <Button type="submit">
-            Sign in
+            LOGIN
             <ArrowRight />
           </Button>
           <LogimMenssage>
