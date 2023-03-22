@@ -17,7 +17,7 @@ import {
   faGoogle,
   faLinkedin,
 } from '@fortawesome/free-brands-svg-icons';
-import { getSession, signIn } from 'next-auth/react';
+import { getSession, signIn, useSession } from 'next-auth/react';
 import { GetServerSideProps } from 'next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,9 +33,10 @@ const claimUserNameFormshema = z.object({
 
 type ClaimUserNameFormData = z.infer<typeof claimUserNameFormshema>;
 
-
-
 function Login() {
+  const session = useSession()
+console.log(session)
+  const [user, setUser] = useState<{ name: string | null; email: string | null; image: string | null } | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -49,29 +50,31 @@ function Login() {
     resolver: zodResolver(claimUserNameFormshema)
   });
 
-  async function handleClaimUsername(data: ClaimUserNameFormData | null | undefined) {
-    const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+  async function onSubmit(values: any) {
 
-    if (!data) return;
-    const result = await signIn('credentials', { ...data, redirect: false });
-    if (result?.error) {
-      setLoginError('Usuário ou senha incorretos!');
-      if (passwordInput) {
-        passwordInput.value = '';
+    try {
+      const { email, password } = values;
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: "/"
+      });
+
+      console.log(result)
+      if (result?.error) {
+        setLoginError(result.error)
+      } else if (result?.url) {
+        router.push(result.url)
+        console.log('tudo ok')
       }
-      return;
+    } catch (error) {
+      console.log(error)
+      setError('Something went wrong')
     }
 
-    const newSession = await getSession();
-    if (newSession) {
-      console.log('Deu certo');
-      router.push('/');
-    } else {
-      setLoginError('Usuário ou senha incorretos!');
-      console.log('Não deu certo');
-
-    }
   }
+
 
   return (
     <>
@@ -79,7 +82,7 @@ function Login() {
         <Header>
           <Heading as="strong">Sing in to your account</Heading>
         </Header>
-        <Form as="form" onSubmit={handleSubmit((data) => handleClaimUsername(data))}>
+        <Form as="form" onSubmit={handleSubmit(onSubmit)}>
           <label>
             <Text size="sm">Email address</Text>
             <TextInput placeholder="Enter your Email" {...register('email')} />
@@ -102,7 +105,7 @@ function Login() {
             </FormError>
 
           </label>
-          <Button type="submit">
+          <Button type="submit" >
             LOGIN
             <ArrowRight />
           </Button>

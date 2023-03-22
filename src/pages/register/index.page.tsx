@@ -27,7 +27,7 @@ const registerFormSchema = z.object({
   confirmPassword: z.string()
 })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "As senhas não coincidem.",
     path: ["confirmPassword",],
   });
 
@@ -53,7 +53,7 @@ export default function Register() {
         <Form as="form" onSubmit={handleSubmit(handleRegister)} >
           <label>
             <Text size="sm">Email address</Text>
-            <TextInput {...register('email')} />
+            <TextInput {...register('email')} placeholder="Enter your Email" />
             <FormError >
               <Text>
                 {errors.email ? errors.email?.message : ''}
@@ -62,7 +62,7 @@ export default function Register() {
           </label>
           <label>
             <Text size="sm">Password</Text>
-            <TextInput {...register('password')} />
+            <TextInput {...register('password')} placeholder="Enter your password" />
             <FormError>
               <Text>
                 {errors.password ? errors.password?.message : ''}
@@ -72,7 +72,7 @@ export default function Register() {
           </label>
           <label>
             <Text size="sm">Confirm Password</Text>
-            <TextInput {...register('confirmPassword')} />
+            <TextInput {...register('confirmPassword')} placeholder="Confirm your Password" />
             <FormError>
               <Text>
                 {errors.confirmPassword ? errors.confirmPassword?.message : ''}
