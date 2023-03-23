@@ -6,12 +6,16 @@ import {
   FormError,
   Header,
   ShowPasswordButton,
+  TextBack,
 } from './styles';
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import { ArrowLeft } from 'phosphor-react';
+import { api } from '@/src/lib/axios';
+import { useRouter } from 'next/router';
 
 const registerFormSchema = z.object({
+  name: z.string().min(1, 'Por favor, insira o seu nome.'),
   email: z
     .string()
     .email('Por favor, insira um endereço de e-mail válido.')
@@ -36,12 +40,23 @@ type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Register() {
 
+  const router = useRouter();
+
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
 
-  function handleRegister(data: RegisterFormData) {
-    console.log(data)
+
+
+  async function handleRegister(data: RegisterFormData) {
+    try {
+      await api.post('/users', {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      })
+      router.push('/login')
+    } catch (err) { console.log(err) }
   }
 
   return (
@@ -52,39 +67,75 @@ export default function Register() {
         </Header>
         <Form as="form" onSubmit={handleSubmit(handleRegister)} >
           <label>
-            <Text size="sm">Email address</Text>
-            <TextInput {...register('email')} placeholder="Enter your Email" />
-            <FormError >
+            <Text size="sm">Name</Text>
+            <TextInput
+              {...register("name", {
+                required: true,
+              })}
+              placeholder="Enter your Name"
+            />
+            <FormError>
               <Text>
-                {errors.email ? errors.email?.message : ''}
+                {errors.name?.type === "required" && "Este campo é obrigatório."}
+                {errors.name?.message}
+              </Text>
+            </FormError>
+          </label>
+          <label>
+            <Text size="sm">Email address</Text>
+            <TextInput
+              {...register("email", {
+                required: true,
+              })}
+              placeholder="Enter your Email"
+            />
+            <FormError>
+              <Text>
+                {errors.email?.type === "required" && "Este campo é obrigatório."}
+                {errors.email?.message}
               </Text>
             </FormError>
           </label>
           <label>
             <Text size="sm">Password</Text>
-            <TextInput {...register('password')} placeholder="Enter your password" />
+            <TextInput
+              {...register("password", {
+                required: true,
+              })}
+              placeholder="Enter your password"
+              autoComplete="new-password"
+            />
             <FormError>
               <Text>
-                {errors.password ? errors.password?.message : ''}
+                {errors.password?.type === "required" && "Este campo é obrigatório."}
+                {errors.password?.message}
               </Text>
             </FormError>
-
           </label>
           <label>
             <Text size="sm">Confirm Password</Text>
-            <TextInput {...register('confirmPassword')} placeholder="Confirm your Password" />
+            <TextInput
+              {...register("confirmPassword", {
+                required: true,
+              })}
+              placeholder="Confirm your Password"
+              autoComplete="new-password"
+            />
             <FormError>
               <Text>
-                {errors.confirmPassword ? errors.confirmPassword?.message : ''}
+                {errors.confirmPassword?.type === "required" && "Este campo é obrigatório."}
+                {errors.confirmPassword?.message}
               </Text>
             </FormError>
-
+            <TextBack>
+              <ArrowLeft />
+              <a href="/login">Return to login page</a>
+            </TextBack>
           </label>
           <Button type="submit">
             Create Account
           </Button>
         </Form>
-
       </Container>
     </>
   );

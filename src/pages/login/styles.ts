@@ -73,7 +73,16 @@ export const TextInput = styled('input', {
 
 });
 
-
+export const TextAcount = styled('div', {
+  color: '$gray400',
+  '& > a': {
+    color: '$ignite500',
+  },
+  '& > a:hover': {
+    color: '$ignite300',
+    textDecoration: 'underline',
+  },
+});
 
 export const ButtonContainer = styled('div', {
   padding: '30px',

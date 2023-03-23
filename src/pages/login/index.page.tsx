@@ -9,6 +9,7 @@ import {
   LogimMenssage,
   ShowPasswordButton,
   SocialButton,
+  TextAcount,
 } from './styles';
 import { ArrowRight } from 'phosphor-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,8 +36,7 @@ type ClaimUserNameFormData = z.infer<typeof claimUserNameFormshema>;
 
 function Login() {
   const session = useSession()
-console.log(session)
-  const [user, setUser] = useState<{ name: string | null; email: string | null; image: string | null } | null>(null);
+  console.log(session)
 
   const [error, setError] = useState<string | null>(null);
 
@@ -109,6 +109,11 @@ console.log(session)
             LOGIN
             <ArrowRight />
           </Button>
+          <ButtonContainer>
+            <TextAcount>
+              New around here? <a href="/register">Create an account.</a>
+            </TextAcount>
+          </ButtonContainer>
           <LogimMenssage>
             <Line />
             <Text size="sm">Or continue with</Text>

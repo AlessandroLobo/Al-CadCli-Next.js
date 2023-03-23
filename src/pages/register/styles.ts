@@ -73,7 +73,22 @@ export const TextInput = styled('input', {
 
 });
 
+export const TextBack = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
 
+
+  '& > a': {
+    color: '$ignite500',
+    textDecoration: 'none',
+  },
+
+  '& > a:hover': {
+    color: '$ignite300',
+    textDecoration: 'none',
+  },
+});
 
 export const ButtonContainer = styled('div', {
   padding: '30px',
