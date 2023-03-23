@@ -58,7 +58,7 @@ function Login() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/"
+        callbackUrl: "/home"
       });
 
       console.log(result)
@@ -143,7 +143,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/home',
         permanent: false,
       },
     };
