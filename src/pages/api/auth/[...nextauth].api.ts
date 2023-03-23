@@ -1,19 +1,24 @@
-import { v4 as uuidv4 } from 'uuid';
 import NextAuth from "next-auth"
 import CredentialsProvider, { CredentialInput } from "next-auth/providers/credentials";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 interface Credentials extends CredentialInput {
   email: string;
   password: string;
 }
 
+declare module "next-auth" {
+  interface User {
+    name?: string;
+    email: string;
+  }
+}
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -27,6 +32,13 @@ export default NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
+      },
+
+      callbacks: {
+        async signIn(user: User, account, profile) {
+          const userFromDB = await prisma.user.findUnique({ where: { email: user.email } });
+          return { id: userFromDB?.id.toString(), name: userFromDB?.name, email: userFromDB?.email };
+        }
       },
 
       async authorize(credentials: Credentials, req) {
@@ -46,7 +58,8 @@ export default NextAuth({
           },
           select: {
             email: true,
-            password: true
+            password: true,
+            name: true
           }
         });
 
@@ -55,7 +68,6 @@ export default NextAuth({
         }
 
         return userWithPassword;
-        console.log(userWithPassword)
       }
 
     }),
@@ -75,12 +87,8 @@ export default NextAuth({
   ],
   secret: process.env.NEXTAUTH_SECRET,
 
-
-
   pages: {
     signIn: "/login",
   },
-
-
 
 })

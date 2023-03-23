@@ -9,13 +9,15 @@ interface HomeProps {
 
 export default function Home({ session }: HomeProps) {
   const { user } = session || {}
+  console.log(user)
 
   return (
     <>
       <Heading as="h1">Home</Heading>
       {user && (
         <>
-          <p>Signed in as {user.name}</p>
+          <p>Nome: {user.name}</p>
+          <p>Email: {user.email}</p>
           <div>
             <button onClick={() => signOut()}>Sign out</button>
           </div>
