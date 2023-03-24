@@ -1,5 +1,7 @@
 import { Heading } from '@ignite-ui/react'
 import { Session } from 'next-auth'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 interface HomeProps {
   session: Session | null
@@ -7,8 +9,13 @@ interface HomeProps {
 
 export default function index({ session }: HomeProps) {
 
-  return (
+  const router = useRouter();
 
-    <Heading as="h1">Index</Heading>
+  useEffect(() => {
+    router.push('/login')
+  }, [])
+
+  return (
+    <Heading as="h1"></Heading>
   )
 }

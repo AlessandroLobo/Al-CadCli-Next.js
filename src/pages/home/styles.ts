@@ -83,30 +83,26 @@ export const Form = styled(Box, {
   },
 })
 
-export const TextInput = styled('input', {
-  backgroundColor: 'transparent !important',
-  border: 'none',
-  borderBottom: '1px solid #333',
-  color: '#333',
 
-  '&:-webkit-autofill, &:-internal-autofill-selected': {
-    backgroundColor: 'transparent !important',
-  },
+export const FormDataTelSexo = styled('div', {
+  // border: '1px solid #ccc',
+  gap: '10px',
+  justifyContent: 'space-between',
+  display: 'flex',
+  flexDirection: 'row',
 
-  '&::placeholder': {
-    color: '#333',
-  },
-
-  '& input:-webkit-autofill': {
-    '-webkit-box-shadow': '0 0 0 30px white inset !important',
-    '-webkit-text-fill-color': '#333 !important',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
   },
 
 });
 
-
-
-
+export const TextInputContainer = styled('div', {
+  flex: '1',
+  display: 'block',
+  flexDirection: 'row',
+  alignItems: 'center',
+});
 
 export const FormError = styled('div', {
 
