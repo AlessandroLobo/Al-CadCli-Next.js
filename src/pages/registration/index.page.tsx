@@ -19,25 +19,63 @@ import {
   SignOutButton,
   TextInputContainer,
 } from './styles'
-import { useGenres } from '@/src/hooks/useGenres';
-import { useState } from 'react';
+import { useGenders } from '@/src/hooks/useGenders';
+import { useEffect, useState } from 'react';
 import { getAddress } from '@/src/hooks/getAddress';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, trigger } from "react-hook-form";
+import { cpf } from 'cpf-cnpj-validator';
+import { parse, format } from 'date-fns';
+
 
 interface HomeProps {
   session: Session | null
 }
 
-interface Genres {
+interface Genders {
   id: number;
   value: string;
   label: string;
 }
 
+const registerFormSchema = z.object({
+  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
+  cpf: z
+    .string()
+    .length(11, "O CPF deve ter exatamente 11 dígitos")
+    .refine((value) => cpf.isValid(value), "CPF inválido")
+    .transform((value) => value.replace(/[^\d]/g, "")),
+  email: z.string().email("Endereço de e-mail inválido"),
+  birthdate: z.date().min(new Date('1900-01-01'), "Data de nascimento inválida"),
+  phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
+  gender: z.string().nonempty({ message: 'Escolha um genero.' }),
+  zipCode: z.string().length(8, "O CEP deve ter exatamente 8 dígitos"),
+  street: z.string().nonempty({ message: 'O endereço é obrigatório.' }),
+  number: z.string().nonempty({ message: 'O número é obrigatório.' }),
+  city: z.string().nonempty({ message: 'A cidade é obrigatória' }),
+  state: z.string().length(2, "O estado deve ter exatamente 2 caracteres"),
+});
+
+
+type RegisterFormData = z.infer<typeof registerFormSchema>;
+
 export default function Home({ session }: HomeProps) {
 
+  const [dataNasc, setDataNasc] = useState<Date | null>(null);
+
+
+
+  const { register, handleSubmit, formState: { errors }, trigger } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerFormSchema),
+  });
+
+  
   const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
   const [error, setError] = useState('');
 
+
+  
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
@@ -52,74 +90,121 @@ export default function Home({ session }: HomeProps) {
       }
       // Atualiza o estado com as informações de endereço retornadas pela API
       setAddressInfo(addressInfo);
-      // ...código omitido para simplificar
+
+      // Re-validate the form fields after updating the address information
     } catch (error) {
       console.log(error)
       setError('Something went wrong')
     }
   }
 
-  const genres: Genres[] = useGenres()
+
+  const genders: Genders[] = useGenders()
 
   const { user } = session || {}
+
+  async function handleRegister() {
+
+  }
+
 
   return (
     <>
       <Container>
-        <Form>
+        <Form as="form" onSubmit={handleSubmit(handleRegister)}>
           <label>
             <Text size="sm">Nome:</Text>
             <TextInput
+              {...register("name", {
+                required: true,
+              })}
               placeholder="Digite seu nome completo"
             />
-            <FormError>
-              <Text>
-              </Text>
-            </FormError>
-            <FormDataTelSexo>
-              <TextInputContainer>
-                <Text size="sm">CPF:</Text>
-                <TextInput
-                  placeholder="Digite seu CPF completo"
-                  style={{ width: '100%' }}
-                />
-              </TextInputContainer>
-              <TextInputContainer>
-                <Text size="sm">E-Mail:</Text>
-                <TextInput
-                  placeholder="Entre com e-Mail completo"
-                  style={{ width: '100%' }}
-                />
-              </TextInputContainer>
-            </FormDataTelSexo>
+            {errors.name && (
+              <FormError>
+                <Text>{errors.name?.message}</Text>
+              </FormError>
+            )}
           </label>
-          {/* Grupo data nasc telefone sexo */}
+          <FormDataTelSexo>
+            <TextInputContainer>
+              <Text size="sm">CPF:</Text>
+              <TextInput
+                {...register("cpf", {
+                  required: true,
+                })}
+                placeholder="Digite seu CPF completo"
+                style={{ width: '100%' }}
+              />
+              {errors.cpf && (
+                <FormError>
+                  <Text>{errors.cpf?.message}</Text>
+                </FormError>
+              )}
+            </TextInputContainer>
+            <TextInputContainer>
+              <Text size="sm">E-Mail:</Text>
+              <TextInput
+                {...register("email", {
+                  required: true,
+                })}
+                placeholder="Entre com e-Mail completo"
+                style={{ width: '100%' }}
+              />
+              {errors.email && (
+                <FormError>
+                  <Text>{errors.email?.message}</Text>
+                </FormError>
+              )}
+            </TextInputContainer>
+          </FormDataTelSexo>
           <FormDataTelSexo>
             <TextInputContainer>
               <Text size="sm">Data de Nascimento:</Text>
               <TextInput
+                {...register("birthdate", {
+                  required: true,
+                })}
                 placeholder="Digite sua data de Nascimento completo"
                 style={{ width: '100%' }}
+
+
               />
+              {errors.birthdate && (
+                <FormError>
+                  <Text>{errors.birthdate?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm">Telefone:</Text>
               <TextInput
+                {...register("phone", {
+                  required: true,
+                })}
                 placeholder="Entre com o numero de telefone "
                 style={{ width: '100%' }}
               />
+              {errors.phone && (
+                <FormError>
+                  <Text>{errors.phone?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
             <TextInputContainer>
-              <TextInputContainer>
-                <Text size="sm">Sexo:</Text>
-                <Select style={{ width: '100%' }}>
-                  {genres.map(genre => (
-                    <Option key={genre.id} value={genre.value}>
-                      {genre.label}
-                    </Option>
-                  ))}
-                </Select>
-              </TextInputContainer>
+              <Text size="sm">Sexo:</Text>
+              <Select style={{ width: '100%' }} {...register("gender", { required: true })}>
+                {genders.map(gender => (
+                  <Option key={gender.id} value={gender.value}>
+                    {gender.label}
+                  </Option>
+                ))}
+              </Select>
+              {errors.gender && (
+                <FormError>
+                  <Text>{errors.gender?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
@@ -127,47 +212,88 @@ export default function Home({ session }: HomeProps) {
             <TextInputContainer>
               <Text size="sm">CEP:</Text>
               <TextInput
+                {...register("zipCode", {
+                  required: true,
+                })}
                 onBlur={handleGetAddressBlur}
                 placeholder="Digite o CEP"
                 style={{ width: '100%' }}
               />
+              {errors.zipCode && (
+                <FormError>
+                  <Text>{errors.zipCode?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm">Cidade:</Text>
               <TextInput
+                {...register("city", {
+                  required: true,
+                })}
                 placeholder="Cidade"
                 style={{ width: '100%' }}
                 value={addressInfo.city ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, city: event.target.value })}
               />
+              {errors.city && (
+                <FormError>
+                  <Text>{errors.city?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
           </FormDataTelSexo>
 
+          {/* Grupo Endereço, Numero e Estado */}
           <FormDataTelSexo>
             <TextInputContainer>
               <Text size="sm">Endereço:</Text>
               <TextInput
+                {...register("street", {
+                  required: true,
+                })}
                 placeholder="Endereço completo"
                 style={{ width: '100%' }}
                 value={addressInfo.address ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, address: event.target.value })}
               />
+              {errors.street && (
+                <FormError>
+                  <Text>{errors.street?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm">Numero:</Text>
               <TextInput
+                {...register("number", {
+                  required: true,
+                })}
                 placeholder="Digite o numero da casa"
                 style={{ width: '100%' }}
               />
+              {errors.number && (
+                <FormError>
+                  <Text>{errors.number?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm">Estado:</Text>
               <TextInput
+                {...register("state", {
+                  required: true,
+                })}
                 placeholder="Estado"
                 style={{ width: '100%' }}
                 value={addressInfo.state ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, state: event.target.value })}
               />
+              {errors.state && (
+                <FormError>
+                  <Text>{errors.state?.message}</Text>
+                </FormError>
+              )}
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />

@@ -1,13 +1,13 @@
 import { useState } from "react"
 
-interface Genres {
+interface Genders {
   id: number
   value: string;
   label: string;
 }
 
-export const useGenres = () => {
-  const [genres, setGenres] = useState([
+export const useGenders = () => {
+  const [genders, setGenders] = useState([
     { id: 0, value: '', label: '' },
     { id: 1, value: 'masculino', label: 'Masculino' },
     { id: 2, value: 'feminino', label: 'Feminino' },
@@ -19,5 +19,5 @@ export const useGenres = () => {
     { id: 8, value: 'prefiro-nao-dizer', label: 'Prefiro não dizer' },
   ]);
 
-  return genres;
+  return genders;
 };
