@@ -75,7 +75,6 @@ function Login() {
 
   }
 
-
   return (
     <>
       <Container>
@@ -143,7 +142,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     return {
       redirect: {
-        destination: '/home',
+        destination: '/registrationSeach',
         permanent: false,
       },
     };

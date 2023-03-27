@@ -1,19 +1,24 @@
-import { SessionProvider } from "next-auth/react"
-import type { AppProps } from "next/app"
-import { globalStyles } from './styles/global'
+import { SessionProvider } from "next-auth/react";
+import type { AppProps } from "next/app";
+import { globalStyles } from "./styles/global";
+import { HeaderPage } from "./components/HeaderPage";
 
-globalStyles()
+globalStyles();
 
 export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <SessionProvider
-      // Provider options are not required but can be useful in situations where
-      // you have a short session maxAge time. Shown here with default values.
-      session={pageProps.session}
-    >
-      <Component {...pageProps} />
+  const { session } = pageProps;
 
-      
+  let headerComponent;
+  if (session) {
+    headerComponent = <HeaderPage session={session} />;
+  } else {
+    headerComponent = <HeaderPage />;
+  }
+
+  return (
+    <SessionProvider session={session}>
+      {headerComponent}
+      <Component {...pageProps} />
     </SessionProvider>
-  )
+  );
 }

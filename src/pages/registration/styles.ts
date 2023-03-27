@@ -21,7 +21,30 @@ export const HeaderTitle = styled('div', {
   paddingLeft: '20px',
   fontSize: '30px',
 
+
 })
+
+export const Select = styled('select', {
+  height: '45px',
+  color: '$gray100',
+  borderRadius: '8px',
+  padding: '$2 $4',
+  fontSize: '15px',
+  backgroundColor: '$gray900',
+  border: 'none',
+  appearance: 'none',
+
+  '&:focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 1px $colors$ignite300',
+  },
+});
+
+export const Option = styled('option', {
+  backgroundColor: '$gray900',
+  color: '$gray100',
+});
+
 
 export const HeaderInfo = styled('div', {
   display: 'flex',
