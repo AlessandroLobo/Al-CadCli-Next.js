@@ -8,15 +8,9 @@ import {
   Form,
   FormDataTelSexo,
   FormError,
-  Header,
-  HeaderInfo,
-  HeaderTitle,
   Line,
-  NameAndEmail,
   Option,
-  ProfilePhoto,
   Select,
-  SignOutButton,
   TextInputContainer,
 } from './styles'
 import { useGenders } from '@/src/hooks/useGenders';
@@ -24,10 +18,9 @@ import { useEffect, useState } from 'react';
 import { getAddress } from '@/src/hooks/getAddress';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, trigger } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { cpf } from 'cpf-cnpj-validator';
-import { parse, format } from 'date-fns';
-
+import { cepMask, cpfMask, dataMask, phoneMask } from '@/src/utils/maskUtils';
 
 interface HomeProps {
   session: Session | null
@@ -47,35 +40,28 @@ const registerFormSchema = z.object({
     .refine((value) => cpf.isValid(value), "CPF inválido")
     .transform((value) => value.replace(/[^\d]/g, "")),
   email: z.string().email("Endereço de e-mail inválido"),
-  birthdate: z.date().min(new Date('1900-01-01'), "Data de nascimento inválida"),
+
+  birthdate: z.string().length(8, "Digiete uma data valida"),
+
   phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
   gender: z.string().nonempty({ message: 'Escolha um genero.' }),
   zipCode: z.string().length(8, "O CEP deve ter exatamente 8 dígitos"),
-  street: z.string().nonempty({ message: 'O endereço é obrigatório.' }),
+  // street: z.string().nonempty({ message: 'O endereço é obrigatório.' }),
   number: z.string().nonempty({ message: 'O número é obrigatório.' }),
-  city: z.string().nonempty({ message: 'A cidade é obrigatória' }),
-  state: z.string().length(2, "O estado deve ter exatamente 2 caracteres"),
+  // city: z.string().nonempty({ message: 'A cidade é obrigatória' }),
+  // state: z.string().length(2, "O estado deve ter exatamente 2 caracteres"),
 });
-
 
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Home({ session }: HomeProps) {
-
   const [dataNasc, setDataNasc] = useState<Date | null>(null);
-
-
-
   const { register, handleSubmit, formState: { errors }, trigger } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
-
-  
   const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
   const [error, setError] = useState('');
 
-
-  
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
@@ -98,15 +84,13 @@ export default function Home({ session }: HomeProps) {
     }
   }
 
-
   const genders: Genders[] = useGenders()
 
   const { user } = session || {}
 
-  async function handleRegister() {
-
+  async function handleRegister(data: RegisterFormData) {
+    console.log(data)
   }
-
 
   return (
     <>
@@ -135,6 +119,10 @@ export default function Home({ session }: HomeProps) {
                 })}
                 placeholder="Digite seu CPF completo"
                 style={{ width: '100%' }}
+                onBlur={(e) => {
+                  e.target.value = cpfMask(e.target.value);
+                  trigger("cpf");
+                }}
               />
               {errors.cpf && (
                 <FormError>
@@ -167,8 +155,10 @@ export default function Home({ session }: HomeProps) {
                 })}
                 placeholder="Digite sua data de Nascimento completo"
                 style={{ width: '100%' }}
-
-
+                onBlur={(e) => {
+                  e.target.value = dataMask(e.target.value);
+                  trigger("birthdate");
+                }}
               />
               {errors.birthdate && (
                 <FormError>
@@ -184,6 +174,10 @@ export default function Home({ session }: HomeProps) {
                 })}
                 placeholder="Entre com o numero de telefone "
                 style={{ width: '100%' }}
+                onBlur={(e) => {
+                  e.target.value = phoneMask(e.target.value);
+                  trigger("phone");
+                }}
               />
               {errors.phone && (
                 <FormError>
@@ -215,9 +209,14 @@ export default function Home({ session }: HomeProps) {
                 {...register("zipCode", {
                   required: true,
                 })}
-                onBlur={handleGetAddressBlur}
                 placeholder="Digite o CEP"
                 style={{ width: '100%' }}
+                onBlur={(e) => {
+                  handleGetAddressBlur(e);
+                  const formattedValue = cepMask(e.target.value);
+                  e.target.value = formattedValue;
+                  trigger("zipCode");
+                }}
               />
               {errors.zipCode && (
                 <FormError>
@@ -225,43 +224,33 @@ export default function Home({ session }: HomeProps) {
                 </FormError>
               )}
             </TextInputContainer>
+
             <TextInputContainer>
               <Text size="sm">Cidade:</Text>
               <TextInput
-                {...register("city", {
-                  required: true,
-                })}
+                contentEditable={false}
+                readOnly={true}
                 placeholder="Cidade"
-                style={{ width: '100%' }}
+                style={{ width: '100%', pointerEvents: 'none' }}
                 value={addressInfo.city ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, city: event.target.value })}
               />
-              {errors.city && (
-                <FormError>
-                  <Text>{errors.city?.message}</Text>
-                </FormError>
-              )}
+
             </TextInputContainer>
           </FormDataTelSexo>
-
           {/* Grupo Endereço, Numero e Estado */}
           <FormDataTelSexo>
             <TextInputContainer>
               <Text size="sm">Endereço:</Text>
               <TextInput
-                {...register("street", {
-                  required: true,
-                })}
+                contentEditable={false}
+                readOnly={true}
                 placeholder="Endereço completo"
-                style={{ width: '100%' }}
+                style={{ width: '100%', pointerEvents: 'none' }}
                 value={addressInfo.address ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, address: event.target.value })}
               />
-              {errors.street && (
-                <FormError>
-                  <Text>{errors.street?.message}</Text>
-                </FormError>
-              )}
+
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm">Numero:</Text>
@@ -281,19 +270,14 @@ export default function Home({ session }: HomeProps) {
             <TextInputContainer>
               <Text size="sm">Estado:</Text>
               <TextInput
-                {...register("state", {
-                  required: true,
-                })}
+                contentEditable={false}
+                readOnly={true}
                 placeholder="Estado"
-                style={{ width: '100%' }}
+                style={{ width: '100%', pointerEvents: 'none' }}
                 value={addressInfo.state ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, state: event.target.value })}
               />
-              {errors.state && (
-                <FormError>
-                  <Text>{errors.state?.message}</Text>
-                </FormError>
-              )}
+
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
