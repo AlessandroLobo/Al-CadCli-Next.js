@@ -14,13 +14,14 @@ import {
   TextInputContainer,
 } from './styles'
 import { useGenders } from '@/src/hooks/useGenders';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getAddress } from '@/src/hooks/getAddress';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
 import { cpf } from 'cpf-cnpj-validator';
 import { cepMask, cpfMask, dataMask, phoneMask } from '@/src/utils/maskUtils';
+import { api } from '@/src/lib/axios';
 
 interface HomeProps {
   session: Session | null
@@ -46,10 +47,10 @@ const registerFormSchema = z.object({
   phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
   gender: z.string().nonempty({ message: 'Escolha um genero.' }),
   zipCode: z.string().length(8, "O CEP deve ter exatamente 8 dígitos"),
-  // street: z.string().nonempty({ message: 'O endereço é obrigatório.' }),
+  // street: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
   number: z.string().nonempty({ message: 'O número é obrigatório.' }),
-  // city: z.string().nonempty({ message: 'A cidade é obrigatória' }),
-  // state: z.string().length(2, "O estado deve ter exatamente 2 caracteres"),
+  // city: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
+  // state: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
 });
 
 type RegisterFormData = z.infer<typeof registerFormSchema>;
@@ -88,8 +89,43 @@ export default function Home({ session }: HomeProps) {
 
   const { user } = session || {}
 
+  const initialFormState = {
+    name: '',
+    cpf: '',
+    email: '',
+    birthdate: '',
+    phone: '',
+    gender: '',
+    zipCode: '',
+    street: '',
+    number: '',
+    city: '',
+    state: '',
+  };
+
+  const [formState, setFormState] = useState<RegisterFormData>(initialFormState);
+
+
   async function handleRegister(data: RegisterFormData) {
     console.log(data)
+    try {
+      await api.post('/client', {
+        name: data.name,
+        cpf: data.cpf,
+        email: data.email,
+        birthdate: data.birthdate,
+        phone: data.phone,
+        gender: data.gender,
+        zipCode: data.zipCode,
+        // street: data.street,
+        number: data.number,
+        // city: data.city,
+        // state: data.state,
+      })
+      setFormState(initialFormState);
+    } catch (err) { console.log(err) }
+    console.log(data)
+
   }
 
   return (
@@ -224,6 +260,7 @@ export default function Home({ session }: HomeProps) {
                 </FormError>
               )}
             </TextInputContainer>
+
 
             <TextInputContainer>
               <Text size="sm">Cidade:</Text>

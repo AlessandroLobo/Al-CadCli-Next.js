@@ -13,6 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft } from 'phosphor-react';
 import { api } from '@/src/lib/axios';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { error } from 'console';
 
 const registerFormSchema = z.object({
   name: z.string().min(1, 'Por favor, insira o seu nome.'),
@@ -47,6 +49,7 @@ export default function Register() {
   });
 
 
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   async function handleRegister(data: RegisterFormData) {
     try {
@@ -54,17 +57,32 @@ export default function Register() {
         name: data.name,
         email: data.email,
         password: data.password,
-      })
-      router.push('/login')
-    } catch (err) { console.log(err) }
+      });
+      router.push('/login');
+    } catch (err: any) {
+      if (err.response && err.response.status === 409) {
+        setRegisterError(err.response.data.message); // Define o erro de registro com a mensagem personalizada retornada pelo servidor
+      } else {
+        setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
+      }
+    }
   }
+
 
   return (
     <>
       <Container>
+        
         <Header>
           <Heading as="strong">Create your account</Heading>
         </Header>
+        {registerError && (
+          <FormError>
+            <Text>
+              {registerError}
+            </Text>
+          </FormError>
+        )}
         <Form as="form" onSubmit={handleSubmit(handleRegister)} >
           <label>
             <Text size="sm">Name</Text>
