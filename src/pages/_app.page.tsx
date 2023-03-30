@@ -8,16 +8,9 @@ globalStyles();
 export default function App({ Component, pageProps }: AppProps) {
   const { session } = pageProps;
 
-  let headerComponent;
-  if (session) {
-    headerComponent = <HeaderPage session={session} />;
-  } else {
-    headerComponent = <HeaderPage />;
-  }
-
   return (
     <SessionProvider session={session}>
-      {headerComponent}
+      <HeaderPage session={session} /> 
       <Component {...pageProps} />
     </SessionProvider>
   );

@@ -16,9 +16,9 @@ export const HeaderPage = ({ session }: HomeProps) => {
   }, []);
 
   const isOnRegisterPage = currentPage === '/registration';
-  const isOnRegistrationSeachPage = currentPage === '/registrationSeach';
+  const isOnRegistrationSeachPage = currentPage === '/registrationSearch';
   const user = session?.user;
-
+  console.log(session);
   return (
     <Header>
       <HeaderTitle>
@@ -31,7 +31,7 @@ export const HeaderPage = ({ session }: HomeProps) => {
         )}
         {session && isOnRegisterPage && (
           <ReaderFindRegister>
-            <a href="/registrationSeach">Pesquisa</a>
+            <a href="/registrationSearch">Pesquisa</a>
             <span>Cadastro</span>
           </ReaderFindRegister>
         )}
