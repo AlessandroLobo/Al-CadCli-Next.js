@@ -58,7 +58,7 @@ function Login() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/home"
+        callbackUrl: "/registrationSeach"
       });
 
       console.log(result)

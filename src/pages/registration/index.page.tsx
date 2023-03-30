@@ -22,7 +22,6 @@ import { useForm } from "react-hook-form";
 import { cpf } from 'cpf-cnpj-validator';
 import { cepMask, cpfMask, dataMask, phoneMask } from '@/src/utils/maskUtils';
 import { api } from '@/src/lib/axios';
-
 interface HomeProps {
   session: Session | null
 }
@@ -47,17 +46,17 @@ const registerFormSchema = z.object({
   phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
   gender: z.string().nonempty({ message: 'Escolha um genero.' }),
   zipCode: z.string().length(8, "O CEP deve ter exatamente 8 dígitos"),
-  // street: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
+  city: z.string().optional(),
+  address: z.string().optional(),
   number: z.string().nonempty({ message: 'O número é obrigatório.' }),
-  // city: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
-  // state: z.string().nonempty({ message: 'Esse campo é obrigatório' }),
+  state: z.string().optional(),
 });
 
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Home({ session }: HomeProps) {
   const [dataNasc, setDataNasc] = useState<Date | null>(null);
-  const { register, handleSubmit, formState: { errors }, trigger } = useForm<RegisterFormData>({
+  const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
   const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
@@ -78,6 +77,8 @@ export default function Home({ session }: HomeProps) {
       // Atualiza o estado com as informações de endereço retornadas pela API
       setAddressInfo(addressInfo);
 
+      console.log('Address Info:', addressInfo); // adicionando novo log
+
       // Re-validate the form fields after updating the address information
     } catch (error) {
       console.log(error)
@@ -89,22 +90,7 @@ export default function Home({ session }: HomeProps) {
 
   const { user } = session || {}
 
-  const initialFormState = {
-    name: '',
-    cpf: '',
-    email: '',
-    birthdate: '',
-    phone: '',
-    gender: '',
-    zipCode: '',
-    street: '',
-    number: '',
-    city: '',
-    state: '',
-  };
-
-  const [formState, setFormState] = useState<RegisterFormData>(initialFormState);
-
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   async function handleRegister(data: RegisterFormData) {
     console.log(data)
@@ -117,15 +103,22 @@ export default function Home({ session }: HomeProps) {
         phone: data.phone,
         gender: data.gender,
         zipCode: data.zipCode,
-        // street: data.street,
+        city: addressInfo.city, // aqui estamos incluindo o valor de city a partir do estado local
+        address: addressInfo.address, // aqui estamos incluindo o valor de address a partir do estado local
         number: data.number,
-        // city: data.city,
-        // state: data.state,
+        state: addressInfo.state, // aqui estamos incluindo o valor de state a partir do estado local
       })
-      setFormState(initialFormState);
-    } catch (err) { console.log(err) }
-    console.log(data)
-
+      console.log(data)
+      alert('Cadastro realizado com sucesso!');
+      reset()
+      setAddressInfo({ city: '', address: '', state: '' });
+    } catch (err: any) {
+      if (err.response && err.response.status === 409) {
+        setRegisterError(err.response.data.message); // Define o erro de registro com a mensagem personalizada retornada pelo servidor
+      } else {
+        setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
+      }
+    }
   }
 
   return (
@@ -133,6 +126,13 @@ export default function Home({ session }: HomeProps) {
       <Container>
         <Form as="form" onSubmit={handleSubmit(handleRegister)}>
           <label>
+            {registerError && (
+              <FormError>
+                <Text>
+                  {registerError}
+                </Text>
+              </FormError>
+            )}
             <Text size="sm">Nome:</Text>
             <TextInput
               {...register("name", {
