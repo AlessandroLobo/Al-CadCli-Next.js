@@ -36,7 +36,6 @@ type ClaimUserNameFormData = z.infer<typeof claimUserNameFormshema>;
 
 function Login() {
   const session = useSession()
-  console.log(session)
 
   const [error, setError] = useState<string | null>(null);
 
@@ -61,12 +60,10 @@ function Login() {
         callbackUrl: '/' // <-- Corrigido para a página de busca
       });
 
-      console.log(result)
       if (result?.error) {
         setLoginError(result.error)
       } else if (result?.url) {
         router.push(result.url)
-        console.log('tudo ok')
       }
     } catch (error) {
       console.log(error)
@@ -142,7 +139,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     return {
       redirect: {
-        destination: '/registrationSeach',
+        destination: '/registrationSearch',
         permanent: false,
       },
     };

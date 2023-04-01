@@ -5,6 +5,9 @@ import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import { User, Account, Profile } from "next-auth";
+import { setCookie } from 'nookies';
+
 
 const prisma = new PrismaClient();
 
@@ -35,40 +38,60 @@ export default NextAuth({
       },
 
       callbacks: {
-        async signIn(user: User, account, profile) {
-          const userFromDB = await prisma.user.findUnique({ where: { email: user.email } });
-          return { id: userFromDB?.id.toString(), name: userFromDB?.name, email: userFromDB?.email };
+        callbacks: {
+          async signIn(user: User, account: Account, profile: Profile) {
+            const userFromDB = await prisma.user.findUnique({ where: { email: user.email } });
+            return {
+              id: userFromDB?.id.toString(),
+              name: userFromDB?.name,
+              email: userFromDB?.email
+            };
+          },
+
+          async jwt({ token, account }) {
+            // Persist the OAuth access_token to the token right after signin
+            if (account) {
+              token.accessToken = account.access_token
+            }
+            return token
+          },
+          async session({ session, token, user }) {
+            // Send properties to the client, like an access_token from a provider.
+            session.accessToken = token.accessToken
+            return session
+          }
         }
       },
 
-      async authorize(credentials: Credentials, req) {
-
-        const { email, password } = Object.fromEntries(
-          Object.entries(credentials).filter(([key]) =>
-            ['email', 'password'].includes(key)
-          )
-        );
-
-        console.log('Email:', email); // Verifica o valor do campo `email`
-        console.log('Password:', password); // Verifica o valor do campo `password`
+      async authorize(credentials: Credentials, req: any) {
+        const { email, password } = credentials;
 
         const userWithPassword = await prisma.user.findUnique({
           where: {
             email,
           },
           select: {
+            id: true,
             email: true,
+            name: true,
             password: true,
-            name: true
-          }
+          },
         });
 
         if (!userWithPassword || userWithPassword.password !== password) {
           throw new Error("Invalid email or password.");
         }
 
-        return userWithPassword;
+        return {
+          id: userWithPassword.id.toString(),
+          name: userWithPassword.name ?? undefined,
+          email: userWithPassword.email,
+          session: {
+            userId: userWithPassword.id
+          }
+        }
       }
+
 
     }),
     LinkedInProvider({

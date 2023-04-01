@@ -128,9 +128,9 @@ export default function Home({ session }: HomeProps) {
           <label>
             {registerError && (
               <FormError>
-                <Text>
+                <>
                   {registerError}
-                </Text>
+                </>
               </FormError>
             )}
             <Text size="sm">Nome:</Text>

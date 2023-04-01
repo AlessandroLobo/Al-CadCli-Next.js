@@ -18,7 +18,6 @@ export const HeaderPage = ({ session }: HomeProps) => {
   const isOnRegisterPage = currentPage === '/registration';
   const isOnRegistrationSeachPage = currentPage === '/registrationSearch';
   const user = session?.user;
-  console.log(session);
   return (
     <Header>
       <HeaderTitle>

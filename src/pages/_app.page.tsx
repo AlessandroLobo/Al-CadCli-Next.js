@@ -7,6 +7,7 @@ globalStyles();
 
 export default function App({ Component, pageProps }: AppProps) {
   const { session } = pageProps;
+  // const headerComponent = session ? <HeaderPage session={session} /> : <HeaderPage />;
 
   return (
     <SessionProvider session={session}>

@@ -74,6 +74,27 @@ export const SignOutButton = styled('div', {
   },
 })
 
+export const TextInput = styled('input', {
+  backgroundColor: 'transparent !important',
+  border: 'none',
+  borderBottom: '1px solid #333',
+  color: '#333',
+
+  '&:-webkit-autofill, &:-internal-autofill-selected': {
+    backgroundColor: 'transparent !important',
+  },
+
+  '&::placeholder': {
+    color: '#333',
+  },
+
+  '& input:-webkit-autofill': {
+    '-webkit-box-shadow': '0 0 0 30px white inset !important',
+    '-webkit-text-fill-color': '#333 !important',
+  },
+
+});
+
 export const ProfilePhoto = styled('div', {
   maxWidth: '50px',
   maxHeight: '50px',

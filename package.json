@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -23,6 +23,8 @@
     "cpf-cnpj-validator": "^1.0.3",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.7",
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.3",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "jsonwebtoken": "^9.0.0",
@@ -30,8 +32,10 @@
     "next": "13.2.4",
     "next-auth": "^4.20.1",
     "nextjs-progressbar": "^0.0.16",
+    "nookies": "^2.5.2",
     "nprogress": "^0.2.0",
     "react": "18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.7",
     "react-select": "^5.7.2",
