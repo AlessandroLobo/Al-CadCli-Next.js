@@ -1,4 +1,4 @@
 export interface RegistrationEditProps {
-  client: any;
+  clientId: any;
   setModalOpen: (isOpen: boolean) => void;
 }

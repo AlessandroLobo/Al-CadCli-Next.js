@@ -28,7 +28,7 @@ export const ContainerModal = styled('div', {
   height: '10rem',
   margin: '$20 auto $4',
   position: 'fixed',
-  top: 'calc(50% - 500px)', // move o modal 100 pixels para cima
+  top: 'calc(50% - 180px)', // move o modal 100 pixels para cima
   left: '50%',
   transform: 'translate(-50%, -50%)',
   zIndex: 1000,

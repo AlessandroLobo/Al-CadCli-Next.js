@@ -13,9 +13,16 @@ import RegistrationEdit from '../components/RegistrationEdit/registrationEdit'
 interface HomeProps {
   session: Session | null
 }
+interface Clients {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  cpf: string;
+  email: string;
+}
 
 interface RegistrationEditProps {
-  client: any;
+  clientId: string;
   setModalOpen: (isOpen: boolean) => void;
 }
 
@@ -31,8 +38,7 @@ async function searchUsers(searchTerm: string): Promise<any> {
 export default function RegistrationSearch({ session }: HomeProps) {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [editVisible, setEditVisible] = useState(false); // Estado para controlar a visibilidade do componente RegistrationEdit
-  const [selectedClient, setSelectedClient] = useState<any>(null); // Estado para armazenar o cliente selecionado na tabela
-  const userLogin = useSession()
+  const [selectedClients, setSelectedClients] = useState<any>(null); // Estado para armazenar o cliente selecionado na tabela
 
   async function handleSearch() {
     const searchTerm = (document.querySelector('#search-input') as HTMLInputElement)?.value || ''
@@ -40,10 +46,12 @@ export default function RegistrationSearch({ session }: HomeProps) {
     setSearchResults(clients)
   }
 
-  function handleEdit({ client }: RegistrationEditProps) {
-    setSelectedClient(client); // Armazena o cliente selecionado na tabela
+  function handleEdit(clientId: string) {
+    setSelectedClients(clientId); // Armazena o cliente selecionado na tabela
     setEditVisible(true); // Exibe o componente RegistrationEdit
+    console.log('RegistrationSearch======', clientId)
   }
+
 
   return (
     <Container>
@@ -63,37 +71,47 @@ export default function RegistrationSearch({ session }: HomeProps) {
                   <td style={{ width: '40%' }}>NOME:</td>
                   <td style={{ width: '20%' }}>TELEFONE:</td>
                   <td style={{ width: '20%' }}>CPF:</td>
-                  <td style={{ width: '20%' }} >E-MAIL:</td>
+                  <td style={{ width: '20%' }}>E-MAIL:</td>
                 </tr>
               </HeaderTitle>
               <Line />
               <TableResult>
                 {searchResults.map((clients) => (
                   <tr key={clients.id}>
-                    <td onClick={() => handleEdit(clients)} style={{ width: '50%', paddingLeft: '10px', textTransform: 'uppercase', }}>{clients.name}</td>
-                    <td style={{ width: '20%' }} data-original-value={clients.phoneNumber} contentEditable={true} onBlur={(e) => {
-                      const originalValue = e.target.getAttribute('data-original-value') ?? '';
-                      const maskedValue = cpfMask(originalValue)
-                      e.target.innerHTML = maskedValue
-                    }}>
-                      {phoneMask(clients.phoneNumber)}
+                    <td onClick={() => handleEdit(clients.id)} style={{ width: '50%', paddingLeft: '10px', textTransform: 'uppercase' }}>
+                      {clients.name}
                     </td>
-                    <td style={{ width: '20%' }} data-original-value={clients.cpf} contentEditable={true} onBlur={(e) => {
-                      const originalValue = e.target.getAttribute('data-original-value') ?? '';
-                      const maskedValue = cpfMask(originalValue)
-                      e.target.innerHTML = maskedValue
-                    }}>
-                      {cpfMask(clients.cpf)}
+                    <td style={{ width: '20%' }}>
+                      <input
+                        type="text"
+                        value={phoneMask(clients.phoneNumber)}
+                        onChange={(event) => {
+                          const maskedValue = cpfMask(event.target.value);
+                          // Aqui você pode atualizar o valor no estado ou passar para outra função
+                        }}
+                      />
                     </td>
-                    <td style={{ width: '10%' }} >{clients.email}</td>
+                    <td style={{ width: '20%' }}>
+                      <input
+                        type="text"
+                        value={cpfMask(clients.cpf)}
+                        onChange={(event) => {
+                          const maskedValue = cpfMask(event.target.value);
+                          // Aqui você pode atualizar o valor no estado ou passar para outra função
+                        }}
+                      />
+                    </td>
+                    <td style={{ width: '10%' }}>{clients.email}</td>
                   </tr>
                 ))}
               </TableResult>
             </Tbody>
+
           )}
         </ContainerList>
+
         {editVisible && (
-          <RegistrationEdit client={selectedClient} setModalOpen={setEditVisible} />
+          <RegistrationEdit clientId={selectedClients} setModalOpen={setEditVisible} />
         )}
       </Form>
     </Container>

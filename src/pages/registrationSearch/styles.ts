@@ -93,7 +93,7 @@ export const TableResult = styled('table', {
     height: '40px',
     background: '$gray700',
     fontSize: '14px',
-    // border: '1px solid red',
+    position: 'relative',
 
     '&:first-child': {
       borderTopLeftRadius: '6px',
@@ -108,20 +108,58 @@ export const TableResult = styled('table', {
     '&:hover': {
       color: '$ignite300',
       cursor: 'pointer',
-
     },
 
+    input: {
+      width: '100%',
+      height: '100%',
+      boxSizing: 'border-box',
+      padding: '10px',
+      border: 'none',
+      borderRadius: '6px',
+      backgroundColor: '$gray700',
+      color: '$gray200',
+      fontSize: '14px',
+
+      '&:focus': {
+        outline: 'none',
+        boxShadow: '0 0 0 2px $colors$ignite500',
+      },
+
+      '&:hover': {
+        color: '$ignite300',
+        cursor: 'pointer',
+      },
+
+    },
   },
 
   'tr:nth-child(even) td': {
     color: '$gray200',
     backgroundColor: '$gray600',
+
     '&:hover': {
       color: '$ignite300',
       cursor: 'pointer',
     },
+
+
+    input: {
+      backgroundColor: '$gray600',
+      color: '$gray200',
+
+      '&:focus': {
+        boxShadow: '0 0 0 2px $colors$ignite500',
+      },
+
+      '&:hover': {
+        color: '$ignite300',
+        cursor: 'pointer',
+      },
+    },
   },
 });
+
 
 export const TextInputContainer = styled('div', {
   flex: '1',

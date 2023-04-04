@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { id } from "date-fns/locale";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
 const prisma = new PrismaClient({})
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handlerSearch(req: NextApiRequest, res: NextApiResponse) {
   const search = typeof req.query.search === 'string' ? req.query.search : '';
 
   const session = await getSession({ req })
