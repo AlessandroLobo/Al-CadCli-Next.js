@@ -79,6 +79,7 @@ export const TextInput = styled('input', {
   border: 'none',
   borderBottom: '1px solid #333',
   color: '#333',
+  textTransform:'uppercase',
 
   '&:-webkit-autofill, &:-internal-autofill-selected': {
     backgroundColor: 'transparent !important',

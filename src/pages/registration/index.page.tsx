@@ -44,7 +44,7 @@ const registerFormSchema = z.object({
 
   birthdate: z.string().length(8, "Digiete uma data valida"),
 
-  phone: z.string().min(10, "O telefone deve ter pelo menos 10 dígitos"),
+  phone: z.string().min(11, "O telefone deve ter pelo menos 10 dígitos").max(11, "O telefone deve ter no maximo 10 digitos"),
   gender: z.string().nonempty({ message: 'Escolha um genero.' }),
   zipCode: z.string().length(8, "O CEP deve ter exatamente 8 dígitos"),
   city: z.string().optional(),
@@ -71,13 +71,11 @@ export default function Home({ session }: HomeProps) {
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
-
-
-
+  
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
-      const zipCode = event.currentTarget.value.replace(/\D/g, '');
+      const zipCode = event.currentTarget.value.replace(/\D/g, '').toUpperCase();
       const addressInfo = await getAddress(zipCode);
 
       console.log('Endereço retornado pela API:', addressInfo);
@@ -102,7 +100,7 @@ export default function Home({ session }: HomeProps) {
     console.log(data)
     try {
       await api.post('/client', {
-        name: data.name,
+        name: data.name.toUpperCase(),
         cpf: data.cpf,
         email: data.email,
         birthdate: data.birthdate,
@@ -133,10 +131,7 @@ export default function Home({ session }: HomeProps) {
           <div>
             <h1>Cadastro realizado com sucesso!</h1>
           </div>
-
-
         </ModalInfo>
-
         <Form as="form" onSubmit={handleSubmit(handleRegister)}>
           <label>
             {registerError && (
@@ -152,6 +147,7 @@ export default function Home({ session }: HomeProps) {
                 required: true,
               })}
               placeholder="Digite seu nome completo"
+              onBlur={event => event.target.value = event.target.value.toUpperCase()}
             />
             {errors.name && (
               <FormError>
@@ -284,6 +280,9 @@ export default function Home({ session }: HomeProps) {
                 style={{ width: '100%', pointerEvents: 'none' }}
                 value={addressInfo.city ?? 'Aguardando informações...'}
                 onChange={(event) => setAddressInfo({ ...addressInfo, city: event.target.value })}
+                onInput={(event: React.FormEvent<HTMLInputElement>) => {
+                  event.currentTarget.value = event.currentTarget.value.toUpperCase();
+                }}
               />
 
             </TextInputContainer>

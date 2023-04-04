@@ -61,6 +61,7 @@ export const HeaderTitle = styled('table', {
     padding: '0.05rem 1rem',
     background: '$gray600',
     verticalAlign: 'middle',
+    // border: '1px solid red',
 
     '&:first-child': {
       borderTopLeftRadius: '6px',
@@ -84,14 +85,15 @@ type TableResultProps = {
 export const TableResult = styled('table', {
   width: '100%',
   borderCollapse: 'separate',
-  borderSpacing: '0 .5rem',
+  borderSpacing: '0 .7rem',
   borderTopLeftRadius: '6px',
   borderBottomRightRadius: '6px',
 
   td: {
-    height: '60px',
-    padding: '0.05rem 1rem',
+    height: '40px',
     background: '$gray700',
+    fontSize: '14px',
+    // border: '1px solid red',
 
     '&:first-child': {
       borderTopLeftRadius: '6px',
@@ -102,10 +104,24 @@ export const TableResult = styled('table', {
       borderTopRightRadius: '6px',
       borderBottomRightRadius: '6px',
     },
+
+    '&:hover': {
+      color: '$ignite300',
+      cursor: 'pointer',
+
+    },
+
+  },
+
+  'tr:nth-child(even) td': {
+    color: '$gray200',
+    backgroundColor: '$gray600',
+    '&:hover': {
+      color: '$ignite300',
+      cursor: 'pointer',
+    },
   },
 });
-
-
 
 export const TextInputContainer = styled('div', {
   flex: '1',

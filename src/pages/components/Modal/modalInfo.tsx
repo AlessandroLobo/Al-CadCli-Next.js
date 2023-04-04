@@ -25,5 +25,4 @@ export const ModalInfo = ({ children, isOpen, setIsOpen, backDropClose }) => {
       </Container>
     </>
   )
-
 }
