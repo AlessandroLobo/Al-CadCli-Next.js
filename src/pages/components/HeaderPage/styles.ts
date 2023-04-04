@@ -10,6 +10,7 @@ export const Header = styled('div', {
   textAlign: 'left',
   backgroundColor: '$gray800',
   height: '100px',
+  // border: '1px solid red',
 })
 
 export const HeaderTitle = styled('div', {

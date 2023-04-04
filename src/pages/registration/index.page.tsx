@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { cpf } from 'cpf-cnpj-validator';
 import { cepMask, cpfMask, dataMask, phoneMask } from '@/src/utils/maskUtils';
 import { api } from '@/src/lib/axios';
+import { ModalInfo } from '../components/Modal/modalInfo';
 interface HomeProps {
   session: Session | null
 }
@@ -60,7 +61,18 @@ export default function Home({ session }: HomeProps) {
     resolver: zodResolver(registerFormSchema),
   });
   const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
+
   const [error, setError] = useState('');
+
+  const genders: Genders[] = useGenders()
+
+  const { user } = session || {}
+
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+
 
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
@@ -86,12 +98,6 @@ export default function Home({ session }: HomeProps) {
     }
   }
 
-  const genders: Genders[] = useGenders()
-
-  const { user } = session || {}
-
-  const [registerError, setRegisterError] = useState<string | null>(null);
-
   async function handleRegister(data: RegisterFormData) {
     console.log(data)
     try {
@@ -108,8 +114,7 @@ export default function Home({ session }: HomeProps) {
         number: data.number,
         state: addressInfo.state, // aqui estamos incluindo o valor de state a partir do estado local
       })
-      console.log(data)
-      alert('Cadastro realizado com sucesso!');
+      setModalOpen(true)
       reset()
       setAddressInfo({ city: '', address: '', state: '' });
     } catch (err: any) {
@@ -124,6 +129,14 @@ export default function Home({ session }: HomeProps) {
   return (
     <>
       <Container>
+        <ModalInfo isOpen={modalOpen} setIsOpen={setModalOpen} backDropClose={true}>
+          <div>
+            <h1>Cadastro realizado com sucesso!</h1>
+          </div>
+
+
+        </ModalInfo>
+
         <Form as="form" onSubmit={handleSubmit(handleRegister)}>
           <label>
             {registerError && (
@@ -318,7 +331,7 @@ export default function Home({ session }: HomeProps) {
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
-          <Button type="submit" style={{ marginTop: 27, marginBottom: 20 }}>
+          <Button onClick={() => setModalOpen(true)} type="submit" style={{ marginTop: 27, marginBottom: 20 }}>
             CADASTRAR
             <ArrowRight />
           </Button>
