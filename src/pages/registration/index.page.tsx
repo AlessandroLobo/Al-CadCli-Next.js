@@ -11,6 +11,7 @@ import {
   Line,
   Option,
   Select,
+  TextInfo,
   TextInputContainer,
 } from './styles'
 import { useGenders } from '@/src/hooks/useGenders';
@@ -71,7 +72,7 @@ export default function Home({ session }: HomeProps) {
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
-  
+
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
@@ -128,9 +129,9 @@ export default function Home({ session }: HomeProps) {
     <>
       <Container>
         <ModalInfo isOpen={modalOpen} setIsOpen={setModalOpen} backDropClose={true}>
-          <div>
+          <TextInfo>
             <h1>Cadastro realizado com sucesso!</h1>
-          </div>
+          </TextInfo>
         </ModalInfo>
         <Form as="form" onSubmit={handleSubmit(handleRegister)}>
           <label>

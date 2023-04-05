@@ -1,5 +1,19 @@
 import { styled, Box, Heading, Text } from '@ignite-ui/react'
 
+export const Form = styled(Box, {
+  // marginTop: '$6',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '$4',
+  height: '100%',
+  // border: '1px solid red',
+
+    label: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '$2',
+  },
+})
 
 
 export const Header = styled('div', {
@@ -20,19 +34,8 @@ export const HeaderTitle = styled('div', {
   alignItems: 'center',
   paddingLeft: '20px',
   fontSize: '30px',
-})
 
-export const TextInfo = styled('div', {
-  display: 'flex',
-  justifyContent: 'center',
-  textAlign: 'center',
-  alignItems: 'center',
-  paddingLeft: '20px',
-  height: '14rem',
-  fontSize: '16px',
-  width: '100%',
-  // height: '100%',
-  // border: '1px solid red'
+
 })
 
 export const Select = styled('select', {
@@ -69,28 +72,14 @@ export const NameAndEmail = styled('div', {
   textAlign: 'left',
 });
 
-export const SignOutButton = styled('div', {
-  borderRadius: '8px',
-  fontSize: '20px',
-  display: 'flex',
-  alignItems: 'center',
-  width: '100px',
-  height: '30px',
-  marginRight: '20px',
-  color: '$gray400',
 
-  '&:hover': {
-    color: '$ignite300',
-    cursor: 'pointer'
-  },
-})
 
 export const TextInput = styled('input', {
   backgroundColor: 'transparent !important',
   border: 'none',
   borderBottom: '1px solid #333',
   color: '#333',
-  textTransform:'uppercase',
+  textTransform: 'uppercase',
 
   '&:-webkit-autofill, &:-internal-autofill-selected': {
     backgroundColor: 'transparent !important',
@@ -126,18 +115,6 @@ export const Container = styled('main', {
   padding: '0 $4',
 })
 
-export const Form = styled(Box, {
-  marginTop: '$6',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '$4',
-
-  label: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '$2',
-  },
-})
 
 
 export const FormDataTelSexo = styled('div', {
@@ -159,6 +136,24 @@ export const TextInputContainer = styled('div', {
   flexDirection: 'row',
   alignItems: 'center',
 });
+
+export const ButtonContainer = styled('div', {
+  display: 'flex',
+  gap: '100px',
+  justifyContent: 'center',
+  borderRadius: '8px',
+  fontSize: '20px',
+  alignItems: 'center',
+  width: '100%',
+  // height: '30px',
+  marginRight: '20px',
+  color: '$gray400',
+
+  '&:hover': {
+    color: '$ignite300',
+    cursor: 'pointer'
+  },
+})
 
 export const FormError = styled('div', {
 

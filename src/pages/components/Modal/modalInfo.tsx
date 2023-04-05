@@ -1,4 +1,4 @@
-import { ButtonModal, Container, ContainerButton, ContainerModal, ContainerText, CustomX, Overlay, TextModal } from "./styles"
+import { ButtonModal, Container, ContainerButton, ContainerModal, ContainerText, CustomX, Overlay} from "./styles"
 
 interface ModalInfoProps {
   children: React.ReactNode;
@@ -19,14 +19,17 @@ export const ModalInfo = ({ children, isOpen, setIsOpen, backDropClose }: ModalI
       {isOpen && <Overlay onClick={handleBackDropClick} />}
       <Container>
         <ContainerModal>
+          
           <ContainerButton>
             <ButtonModal type="button" >
               <CustomX type="button" onClick={() => setIsOpen(false)} />
             </ButtonModal>
           </ContainerButton>
+
           <ContainerText>
             {children}
           </ContainerText>
+
         </ContainerModal>
       </Container>
     </>
