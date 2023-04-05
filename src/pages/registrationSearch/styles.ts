@@ -41,15 +41,34 @@ export const ContainerList = styled('div', {
   },
 });
 
-export const Tbody = styled('tbody', {
-  // border: '1px solid red',
+export const Table = styled('table', {
   margin: '0',
   width: '100%',
-  height: '100%', /* Adiciona altura total */
-  display: 'block', /* Define o elemento como bloco */
+  height: '100%', 
+  display: 'block', 
 })
 
-export const HeaderTitle = styled('table', {
+export const TextInputContainer = styled('div', {
+  flex: '1',
+  display: 'block',
+  flexDirection: 'row',
+  alignItems: 'center',
+});
+
+export const Text = styled('div', {
+  paddingBottom: '$4'
+});
+
+export const Line = styled('div', {
+  marginTop: '5px',
+  marginBottom: '5px',
+  color: '$gray100',
+  flexGrow: '1',
+  height: '1px',
+  backgroundColor: '$gray500',
+})
+
+export const Thead = styled('thead', {
   width: '100%',
   borderCollapse: 'separate',
   borderSpacing: '0 .5rem',
@@ -82,7 +101,7 @@ type TableResultProps = {
   };
 };
 
-export const TableResult = styled('table', {
+export const TbodyResult = styled('tbody', {
   width: '100%',
   borderCollapse: 'separate',
   borderSpacing: '0 .7rem',
@@ -135,7 +154,7 @@ export const TableResult = styled('table', {
   },
 
   'tr:nth-child(even) td': {
-    color: '$gray200',
+    color: '$gray300',
     backgroundColor: '$gray600',
 
     '&:hover': {
@@ -161,25 +180,7 @@ export const TableResult = styled('table', {
 });
 
 
-export const TextInputContainer = styled('div', {
-  flex: '1',
-  display: 'block',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
 
-export const Text = styled('div', {
-  paddingBottom: '$4'
-});
-
-export const Line = styled('div', {
-  marginTop: '5px',
-  marginBottom: '5px',
-  color: '$gray100',
-  flexGrow: '1',
-  height: '1px',
-  backgroundColor: '$gray500',
-})
 
 export const FormError = styled('div', {
 

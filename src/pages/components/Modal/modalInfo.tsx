@@ -1,10 +1,16 @@
 import { ButtonModal, Container, ContainerButton, ContainerModal, ContainerText, CustomX, Overlay, TextModal } from "./styles"
 
+interface ModalInfoProps {
+  children: React.ReactNode;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  backDropClose?: boolean;
+}
 
-export const ModalInfo = ({ children, isOpen, setIsOpen, backDropClose }) => {
+export const ModalInfo = ({ children, isOpen, setIsOpen, backDropClose }: ModalInfoProps) => {
   if (!isOpen) return null;
 
-  const handleBackDropClick = (e) => {
+  const handleBackDropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e) e.preventDefault();
     setIsOpen(false)
   }

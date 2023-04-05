@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { getSession, signOut, useSession } from 'next-auth/react'
 import { Session } from 'next-auth'
-import { Container, ContainerList, Form, FormError, HeaderTitle, Line, TableResult, Tbody, Text, TextInputContainer } from './styles'
+import { Container, ContainerList, Form, Table, TbodyResult, Text, TextInputContainer, Thead } from './styles'
 import { Button, TextInput } from '@ignite-ui/react'
 import axios from 'axios'
 import { cpfMask, phoneMask } from '@/src/utils/maskUtils'
@@ -64,18 +64,18 @@ export default function RegistrationSearch({ session }: HomeProps) {
           <Button onClick={handleSearch} style={{ marginTop: 17, marginBottom: 10, width: '100%' }}>
             Buscar
           </Button>
+
           {!!searchResults.length && (
-            <Tbody>
-              <HeaderTitle>
+            <Table>
+              <Thead>
                 <tr>
                   <td style={{ width: '40%' }}>NOME:</td>
                   <td style={{ width: '20%' }}>TELEFONE:</td>
                   <td style={{ width: '20%' }}>CPF:</td>
                   <td style={{ width: '20%' }}>E-MAIL:</td>
                 </tr>
-              </HeaderTitle>
-              <Line />
-              <TableResult>
+              </Thead>
+              <TbodyResult>
                 {searchResults.map((clients) => (
                   <tr key={clients.id}>
                     <td onClick={() => handleEdit(clients.id)} style={{ width: '50%', paddingLeft: '10px', textTransform: 'uppercase' }}>
@@ -101,13 +101,14 @@ export default function RegistrationSearch({ session }: HomeProps) {
                         }}
                       />
                     </td>
-                    <td style={{ width: '10%' }}>{clients.email}</td>
+                    <td style={{ width: '10%', paddingLeft: '10px' }}>{clients.email}</td>
                   </tr>
                 ))}
-              </TableResult>
-            </Tbody>
-
+              </TbodyResult>
+            </Table>
           )}
+
+
         </ContainerList>
 
         {editVisible && (

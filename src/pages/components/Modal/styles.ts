@@ -49,7 +49,7 @@ export const ContainerText = styled('button', {
   // border: '1px solid red'
 })
 
-export const ContainerButton = styled('button', {
+export const ContainerButton = styled('div', {
   backgroundColor: 'transparent',
   color: '$gray100',
   display: 'flex',

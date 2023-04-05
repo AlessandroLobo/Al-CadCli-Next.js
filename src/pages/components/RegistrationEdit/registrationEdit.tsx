@@ -3,39 +3,41 @@ import { ModalInfo } from "../Modal/modalInfo";
 import { RegistrationEditProps } from './types';
 import axios from "axios";
 
-async function searchClient(searchTerm: string): Promise<any> {
+interface ClientData {
+  name: string;
+  email: string;
+  phone: string;
+  // Adicione outros campos, se necessário
+}
+
+async function searchClient(clientId: string): Promise<ClientData> {
   try {
-    const response = await axios.get('/api/clientEdit', {
-      params: {
-        search: searchTerm,
-      },
-    });
-
-    console.log('Dados do cliente:', response.data); // Adicionando o console.log aqui
-
+    const response = await axios.post('../api/clientEdit', { clientId });
+    console.log('Dados do cliente:', response.data);
     return response.data;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
-
 export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditProps) {
   const [modalOpen, setModalOpenState] = useState(true);
-  const [searchResults, setSearchResults] = useState([]);
-  console.log('*************', clientId)
+  const [clientData, setClientData] = useState<ClientData | null>(null);
 
   useEffect(() => {
-    console.log('useEffect sendo chamado');
-
-    async function fetchSearchResults() {
-      console.log('fetchSearchResults sendo chamada'); // Adicionando o console.log aqui
-      const results = await searchClient(clientId.toString());
-      setSearchResults(results);
-      console.log('Dados da API:', results); // Adicionando o console.log aqui
+    async function fetchClientData() {
+      console.log('fetchClientData sendo chamada');
+      try {
+        const data = await searchClient(clientId);
+        console.log('clientId', clientId)
+        setClientData(data);
+        console.log('Dados da API:', data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-
-    fetchSearchResults();
+    fetchClientData();
   }, [clientId]);
 
   return (
@@ -45,8 +47,16 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
         setModalOpen(false);
       }} backDropClose={true}>
         <h1>Editar Cliente</h1>
-        <h1>{clientId}</h1>
-        {/* Adicione outros campos aqui, se necessário */}
+        {clientData ? (
+          <>
+            <h2>Nome: {clientData.name}</h2>
+            <h2>Email: {clientData.email}</h2>
+            <h2>Telefone: {clientData.phone}</h2>
+            {/* Adicione outros campos aqui, se necessário */}
+          </>
+        ) : (
+          <h2>Carregando...</h2>
+        )}
       </ModalInfo>
     </>
   )
