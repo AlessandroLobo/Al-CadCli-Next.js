@@ -4,6 +4,7 @@ import { RegistrationEditProps } from './types';
 import axios from "axios";
 import { Button, Text, TextInput } from '@ignite-ui/react';
 import { cpf } from 'cpf-cnpj-validator';
+import { cepMask, cpfMask, dataMask, phoneMask } from '@/src/utils/maskUtils';
 import { useForm } from "react-hook-form";
 import {
   ButtonContainer,
@@ -18,8 +19,10 @@ import {
 } from './styles'
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "@/src/lib/axios";
 
 interface Data {
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -54,12 +57,13 @@ const registerFormSchema = z.object({
   state: z.string().optional(),
 });
 
+
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 async function searchClient(clientId: string): Promise<Data> {
   try {
     const response = await axios.post('../api/clientEdit', { clientId });
-    console.log('Dados do cliente:', response.data);
+    // console.log('Dados do cliente:', response.data);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -71,59 +75,60 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
   const [modalOpen, setModalOpenState] = useState(true);
   const [clientData, setClientData] = useState<Data | null>(null);
 
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
   const formattedClientData = {
     ...clientData,
     birthdate: clientData?.birthdate?.toISOString?.().substr(0, 10),
   };
 
-  const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<RegisterFormData>({
+  const { register, handleSubmit, reset, formState: { errors }, trigger, getValues } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: formattedClientData,
   });
 
-
   useEffect(() => {
     async function fetchClientData() {
-      console.log('fetchClientData sendo chamada');
       try {
         const data = await searchClient(clientId);
-        console.log('clientId', clientId)
         setClientData(data);
-        console.log('Dados da API:', data);
+        reset(data); 
       } catch (error) {
         console.error(error);
       }
     }
+
     fetchClientData();
-  }, [clientId]);
+  }, [clientId, reset]);
 
 
-  async function handleRegister(data: RegisterFormData) {
-    console.log(data)
-    // try {
-    //   await api.post('/clientUpdate', {
-    //     name: data.name.toUpperCase(),
-    //     cpf: data.cpf,
-    //     email: data.email,
-    //     birthdate: data.birthdate,
-    //     phone: data.phone,
-    //     gender: data.gender,
-    //     zipCode: data.zipCode,
-    //     city: addressInfo.city, // aqui estamos incluindo o valor de city a partir do estado local
-    //     address: addressInfo.address, // aqui estamos incluindo o valor de address a partir do estado local
-    //     number: data.number,
-    //     state: addressInfo.state, // aqui estamos incluindo o valor de state a partir do estado local
-    //   })
-    //   setModalOpen(true)
-    //   reset()
-    //   setAddressInfo({ city: '', address: '', state: '' });
-    // } catch (err: any) {
-    //   if (err.response && err.response.status === 409) {
-    //     setRegisterError(err.response.data.message); // Define o erro de registro com a mensagem personalizada retornada pelo servidor
-    //   } else {
-    //     setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
-    //   }
-    // }
+
+  async function handleUpdate(id: string) {
+    try {
+      console.log('Dados enviados para atualização:', clientData);
+      await api.put('/clientUpdate', {
+        id, // Inclui o ID no corpo da requisição
+        name: getValues('name').toUpperCase(),
+        cpf: getValues('cpf'),
+        email: getValues('email'),
+        birthdate: getValues('birthdate'),
+        phone: getValues('phone'),
+        gender: getValues('gender'),
+        zipCode: getValues('zipCode'),
+        city: getValues('city'),
+        address: getValues('address'),
+        number: getValues('number'),
+        state: getValues('state'),
+      })
+      setModalOpen(true)
+      reset()
+    } catch (err: any) {
+      if (err.response && err.response.status === 404) {
+        setRegisterError('Cliente não encontrado');
+      } else {
+        setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
+      }
+    }
   }
 
 
@@ -133,7 +138,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
         setModalOpenState(false);
         setModalOpen(false);
       }} backDropClose={true}>
-        <Form as="form" onSubmit={handleSubmit(handleRegister)}>
+        <Form as="form" onSubmit={handleSubmit(handleUpdate)}>
           <label>
             {/* {registerError && (
               <FormError>
@@ -163,12 +168,12 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 {...register("cpf", {
                   required: true,
                 })}
-                defaultValue={clientData?.cpf || ""}
+                defaultValue={cpfMask(clientData?.cpf || "")}
                 style={{ width: '100%' }}
-              // onBlur={(e) => {
-              //   e.target.value = cpfMask(e.target.value);
-              //   trigger("cpf");
-              // }}
+                onBlur={(e) => {
+                  e.target.value = cpfMask(e.target.value);
+                  trigger("cpf");
+                }}
               />
               {/* {errors.cpf && (
                 <FormError>
@@ -204,7 +209,6 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                     ? new Date(clientData.birthdate).toISOString().split("T")[0].split("-").reverse().join("/")
                     : ""
                 }
-
                 style={{ width: '100%' }}
               // onBlur={(e) => {
               //   e.target.value = dataMask(e.target.value);
@@ -223,12 +227,12 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 {...register("phone", {
                   required: true,
                 })}
-                defaultValue={clientData?.phoneNumber || ""}
+                defaultValue={phoneMask(clientData?.phoneNumber || "")}
                 style={{ width: '100%' }}
-              // onBlur={(e) => {
-              //   e.target.value = phoneMask(e.target.value);
-              //   trigger("phone");
-              // }}
+                onBlur={(e) => {
+                  e.target.value = phoneMask(e.target.value);
+                  trigger("phone");
+                }}
               />
               {/* {errors.phone && (
                 <FormError>
@@ -257,14 +261,12 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 {...register("zipCode", {
                   required: true,
                 })}
-                defaultValue={clientData?.zipCode || ""}
+                defaultValue={cepMask(clientData?.zipCode || "")}
                 style={{ width: '100%' }}
-              // onBlur={(e) => {
-              //   handleGetAddressBlur(e);
-              //   const formattedValue = cepMask(e.target.value);
-              //   e.target.value = formattedValue;
-              //   trigger("zipCode");
-              // }}
+                onBlur={(e) => {
+                  e.target.value = cepMask(e.target.value);
+                  trigger("phone");
+                }}
               />
               {/* {errors.zipCode && (
                 <FormError>
@@ -272,8 +274,6 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 </FormError>
               )} */}
             </TextInputContainer>
-
-
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Cidade:</Text>
               <TextInput
@@ -281,13 +281,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 readOnly={true}
                 defaultValue={clientData?.city || ""}
                 style={{ width: '100%', pointerEvents: 'none' }}
-              // value={addressInfo.city ?? 'Aguardando informações...'}
-              // onChange={(event) => setAddressInfo({ ...addressInfo, city: event.target.value })}
-              // onInput={(event: React.FormEvent<HTMLInputElement>) => {
-              //   event.currentTarget.value = event.currentTarget.value.toUpperCase();
-              // }}
               />
-
             </TextInputContainer>
           </FormDataTelSexo>
           {/* Grupo Endereço, Numero e Estado */}
@@ -299,10 +293,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 readOnly={true}
                 defaultValue={clientData?.address || ""}
                 style={{ width: '100%', pointerEvents: 'none' }}
-              // value={addressInfo.address ?? 'Aguardando informações...'}
-              // onChange={(event) => setAddressInfo({ ...addressInfo, address: event.target.value })}
               />
-
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Numero:</Text>
@@ -326,17 +317,15 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 readOnly={true}
                 defaultValue={clientData?.state || ""}
                 style={{ width: '100%', pointerEvents: 'none' }}
-              // value={addressInfo.state ?? 'Aguardando informações...'}
-              // onChange={(event) => setAddressInfo({ ...addressInfo, state: event.target.value })}
               />
-
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
           <ButtonContainer>
-            <Button type="button" >
+            <Button type="button" onClick={() => handleUpdate(clientData)}>
               ALTERAR
             </Button>
+
             <Button type="button">
               EXCLUIR
             </Button>

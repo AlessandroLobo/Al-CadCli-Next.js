@@ -7,9 +7,6 @@ import { Button, TextInput } from '@ignite-ui/react'
 import axios from 'axios'
 import { cpfMask, phoneMask } from '@/src/utils/maskUtils'
 import RegistrationEdit from '../components/RegistrationEdit/registrationEdit'
-
-
-
 interface HomeProps {
   session: Session | null
 }
@@ -81,7 +78,7 @@ export default function RegistrationSearch({ session }: HomeProps) {
                     <td onClick={() => handleEdit(clients.id)} style={{ width: '50%', paddingLeft: '10px', textTransform: 'uppercase' }}>
                       {clients.name}
                     </td>
-                    <td style={{ width: '20%' }}>
+                    <td onClick={() => handleEdit(clients.id)} style={{ width: '20%' }}>
                       <input
                         type="text"
                         value={phoneMask(clients.phoneNumber)}
@@ -91,7 +88,7 @@ export default function RegistrationSearch({ session }: HomeProps) {
                         }}
                       />
                     </td>
-                    <td style={{ width: '20%' }}>
+                    <td onClick={() => handleEdit(clients.id)} style={{ width: '20%' }}>
                       <input
                         type="text"
                         value={cpfMask(clients.cpf)}
@@ -101,16 +98,13 @@ export default function RegistrationSearch({ session }: HomeProps) {
                         }}
                       />
                     </td>
-                    <td style={{ width: '10%', paddingLeft: '10px' }}>{clients.email}</td>
+                    <td onClick={() => handleEdit(clients.id)} style={{ width: '10%', paddingLeft: '10px' }}>{clients.email}</td>
                   </tr>
                 ))}
               </TbodyResult>
             </Table>
           )}
-
-
         </ContainerList>
-
         {editVisible && (
           <RegistrationEdit clientId={selectedClients} setModalOpen={setEditVisible} />
         )}

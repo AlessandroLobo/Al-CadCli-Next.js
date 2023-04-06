@@ -9,14 +9,14 @@ interface Genders {
 export const useGenders = () => {
   const [genders, setGenders] = useState([
     { id: 0, value: '', label: '' },
-    { id: 1, value: 'masculino', label: 'Masculino' },
-    { id: 2, value: 'feminino', label: 'Feminino' },
-    { id: 3, value: 'nao-binario', label: 'Não-binário' },
-    { id: 4, value: 'agenero', label: 'Agênero' },
-    { id: 5, value: 'genderqueer', label: 'Genderqueer' },
-    { id: 6, value: 'transgenero', label: 'Transgênero' },
-    { id: 7, value: 'outro', label: 'Outro' },
-    { id: 8, value: 'prefiro-nao-dizer', label: 'Prefiro não dizer' },
+    { id: 1, value: 'Nasculino', label: 'Masculino' },
+    { id: 2, value: 'Feminino', label: 'Feminino' },
+    { id: 3, value: 'Nao-binario', label: 'Não-binário' },
+    { id: 4, value: 'Agenero', label: 'Agênero' },
+    { id: 5, value: 'Genderqueer', label: 'Genderqueer' },
+    { id: 6, value: 'Transgenero', label: 'Transgênero' },
+    { id: 7, value: 'Outro', label: 'Outro' },
+    { id: 8, value: 'Prefiro-nao-dizer', label: 'Prefiro não dizer' },
   ]);
 
   return genders;

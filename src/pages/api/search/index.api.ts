@@ -26,6 +26,9 @@ export default async function handlerSearch(req: NextApiRequest, res: NextApiRes
         },
         { userId: { equals: userLogado?.id } }
       ]
+    },
+    orderBy: {
+      name: 'asc'
     }
   });
 

@@ -72,7 +72,7 @@ export default function Home({ session }: HomeProps) {
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
-
+  
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
@@ -336,6 +336,7 @@ export default function Home({ session }: HomeProps) {
             <ArrowRight />
           </Button>
         </Form>
+        {/* <button onClick={() => setModalOpen(true)} style={{ marginTop: 27, marginBottom: 20 }} /> */}
       </Container>
     </>
   )

@@ -137,7 +137,7 @@ export const TbodyResult = styled('tbody', {
       border: 'none',
       borderRadius: '6px',
       backgroundColor: '$gray700',
-      color: '$gray200',
+      color: '$gray100',
       fontSize: '14px',
 
       '&:focus': {
@@ -165,7 +165,7 @@ export const TbodyResult = styled('tbody', {
 
     input: {
       backgroundColor: '$gray600',
-      color: '$gray200',
+      color: '$gray100',
 
       '&:focus': {
         boxShadow: '0 0 0 2px $colors$ignite500',

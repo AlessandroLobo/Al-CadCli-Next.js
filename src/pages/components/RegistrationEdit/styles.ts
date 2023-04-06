@@ -6,6 +6,7 @@ export const Form = styled(Box, {
   flexDirection: 'column',
   gap: '$4',
   height: '100%',
+  zIndex: 1001,
   // border: '1px solid red',
 
     label: {
@@ -92,6 +93,7 @@ export const TextInput = styled('input', {
   '& input:-webkit-autofill': {
     '-webkit-box-shadow': '0 0 0 30px white inset !important',
     '-webkit-text-fill-color': '#333 !important',
+    
   },
 
 });
