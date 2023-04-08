@@ -15,7 +15,7 @@ import {
   TextInputContainer,
 } from './styles'
 import { useGenders } from '@/src/hooks/useGenders';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAddress } from '@/src/hooks/getAddress';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -58,9 +58,13 @@ type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Home({ session }: HomeProps) {
   const [dataNasc, setDataNasc] = useState<Date | null>(null);
-  const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<RegisterFormData>({
+
+
+  const { register, handleSubmit, reset, formState: { errors }, trigger, getValues } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
+  console.log('register:', register);
+
   const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
 
   const [error, setError] = useState('');
@@ -72,7 +76,11 @@ export default function Home({ session }: HomeProps) {
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
-  
+
+
+
+
+
   async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
     try {
       // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
@@ -128,7 +136,7 @@ export default function Home({ session }: HomeProps) {
   return (
     <>
       <Container>
-        <ModalInfo isOpen={modalOpen} setIsOpen={setModalOpen} backDropClose={true}>
+        <ModalInfo isOpen={modalOpen} setIsOpen={setModalOpen}>
           <TextInfo>
             <h1>Cadastro realizado com sucesso!</h1>
           </TextInfo>
@@ -331,7 +339,8 @@ export default function Home({ session }: HomeProps) {
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
-          <Button onClick={() => setModalOpen(true)} type="submit" style={{ marginTop: 27, marginBottom: 20 }}>
+          <Button type="submit" style={{ marginTop: 27, marginBottom: 20 }} >
+
             CADASTRAR
             <ArrowRight />
           </Button>

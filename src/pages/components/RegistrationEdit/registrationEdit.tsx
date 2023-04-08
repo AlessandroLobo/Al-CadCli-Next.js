@@ -20,9 +20,10 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/src/lib/axios";
+import { getAddress } from "@/src/hooks/getAddress";
 
 interface Data {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
@@ -35,7 +36,6 @@ interface Data {
   addressNumber: string;
   phoneNumber: string;
   state: string;
-  // Adicione outros campos, se necessário
 }
 const registerFormSchema = z.object({
   name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
@@ -75,7 +75,36 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
   const [modalOpen, setModalOpenState] = useState(true);
   const [clientData, setClientData] = useState<Data | null>(null);
 
+  const [addressInfo, setAddressInfo] = useState({ city: '', address: '', state: '' });
+
+  const [error, setError] = useState('');
+
   const [registerError, setRegisterError] = useState<string | null>(null);
+
+  async function handleGetAddressBlur(event: React.FocusEvent<HTMLInputElement>) {
+    try {
+      // Chama a função getAddress para buscar as informações de endereço com base no CEP informado pelo usuário
+      const zipCode = event.currentTarget.value.replace(/\D/g, '').toUpperCase();
+      const addressInfo = await getAddress(zipCode);
+
+      console.log('Endereço retornado pela API:', addressInfo);
+
+      if (!addressInfo) {
+        setError('Invalid Zip Code');
+        return;
+      }
+      // Atualiza o estado com as informações de endereço retornadas pela API
+      setAddressInfo(addressInfo);
+
+      console.log('Address Info:', addressInfo); // adicionando novo log
+
+      // Re-validate the form fields after updating the address information
+    } catch (error) {
+      console.log(error)
+      setError('Something went wrong')
+    }
+  }
+
 
   const formattedClientData = {
     ...clientData,
@@ -88,30 +117,68 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
   });
 
   useEffect(() => {
-    async function fetchClientData() {
+    async function fetchData() {
       try {
-        const data = await searchClient(clientId);
-        setClientData(data);
-        reset(data); 
+        const { birthdate, ...restData } = await searchClient(clientId);
+        setClientData({ birthdate: new Date(birthdate), ...restData });
+        reset({});
+
+        const zipCode = restData.zipCode.replace(/\D/g, '').toUpperCase();
+        const addressInfo = await getAddress(zipCode);
+
+        console.log('Endereço retornado pela API:', addressInfo);
+
+        if (!addressInfo) {
+          setError('Invalid Zip Code');
+          return;
+        }
+
+        setAddressInfo(addressInfo);
+
       } catch (error) {
         console.error(error);
+        setError('Something went wrong');
       }
     }
 
-    fetchClientData();
+    fetchData();
   }, [clientId, reset]);
 
+  
 
+  function formatBirthdate(birthdate: string) {
+    const parts = birthdate.split('/');
+    if (parts.length !== 3) {
+      throw new Error('Invalid birthdate format. Expected dd/mm/yyyy.');
+    }
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
 
-  async function handleUpdate(id: string) {
+    return `${year}-${month}-${day}`;
+  }
+
+  async function handleUpdate(id: number) {
     try {
-      console.log('Dados enviados para atualização:', clientData);
+      console.log('Dados enviados para atualização:', id);
+      const clientId = id;
+      console.log(clientId);
+
+      // Format birthdate to expected format
+      const formattedBirthdate = formatBirthdate(getValues('birthdate'));
+
+      // Create Date object from formatted birthdate
+      const birthdate = new Date(formattedBirthdate);
+
+      // Convert birthdate to accepted format
+      const isoBirthdate = birthdate.toISOString();
+
       await api.put('/clientUpdate', {
-        id, // Inclui o ID no corpo da requisição
+        id: clientId,
         name: getValues('name').toUpperCase(),
         cpf: getValues('cpf'),
         email: getValues('email'),
-        birthdate: getValues('birthdate'),
+        birthdate: isoBirthdate,
         phone: getValues('phone'),
         gender: getValues('gender'),
         zipCode: getValues('zipCode'),
@@ -119,12 +186,14 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
         address: getValues('address'),
         number: getValues('number'),
         state: getValues('state'),
-      })
+      });
       setModalOpen(true)
-      reset()
+      alert('Alteração feita')
     } catch (err: any) {
       if (err.response && err.response.status === 404) {
         setRegisterError('Cliente não encontrado');
+      } else if (err.response && err.response.status === 409) {
+        setRegisterError('CPF já cadastrado');
       } else {
         setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
       }
@@ -140,13 +209,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
       }} backDropClose={true}>
         <Form as="form" onSubmit={handleSubmit(handleUpdate)}>
           <label>
-            {/* {registerError && (
+            {registerError && (
               <FormError>
-                <>
-                  {registerError}
-                </>
+                <Text>{registerError}</Text>
               </FormError>
-            )} */}
+            )}
             <Text size="sm" style={{ textAlign: 'left' }}>Nome:</Text>
             <TextInput
               {...register("name", {
@@ -155,11 +222,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
               defaultValue={clientData?.name || ""}
               onBlur={event => event.target.value = event.target.value.toUpperCase()}
             />
-            {/* {errors.name && (
+            {errors.name && (
               <FormError>
                 <Text>{errors.name?.message}</Text>
               </FormError>
-            )} */}
+            )}
           </label>
           <FormDataTelSexo>
             <TextInputContainer>
@@ -175,11 +242,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                   trigger("cpf");
                 }}
               />
-              {/* {errors.cpf && (
+              {errors.cpf && (
                 <FormError>
                   <Text>{errors.cpf?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>E-Mail:</Text>
@@ -190,11 +257,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 defaultValue={clientData?.email || ""}
                 style={{ width: '100%' }}
               />
-              {/* {errors.email && (
+              {errors.email && (
                 <FormError>
                   <Text>{errors.email?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
           </FormDataTelSexo>
           <FormDataTelSexo>
@@ -210,16 +277,13 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                     : ""
                 }
                 style={{ width: '100%' }}
-              // onBlur={(e) => {
-              //   e.target.value = dataMask(e.target.value);
-              //   trigger("birthdate");
-              // }}
+            
               />
-              {/* {errors.birthdate && (
+              {errors.birthdate && (
                 <FormError>
                   <Text>{errors.birthdate?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Telefone:</Text>
@@ -234,11 +298,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                   trigger("phone");
                 }}
               />
-              {/* {errors.phone && (
+              {errors.phone && (
                 <FormError>
                   <Text>{errors.phone?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Sexo:</Text>
@@ -246,11 +310,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 {...register("gender", { required: true })}
                 defaultValue={clientData?.gender || ""}
               />
-              {/* {errors.gender && (
+              {errors.gender && (
                 <FormError>
                   <Text>{errors.gender?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
@@ -264,22 +328,24 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 defaultValue={cepMask(clientData?.zipCode || "")}
                 style={{ width: '100%' }}
                 onBlur={(e) => {
-                  e.target.value = cepMask(e.target.value);
-                  trigger("phone");
+                  handleGetAddressBlur(e);
+                  const formattedValue = cepMask(e.target.value);
+                  e.target.value = formattedValue;
+                  trigger("zipCode");
                 }}
               />
-              {/* {errors.zipCode && (
+              {errors.zipCode && (
                 <FormError>
                   <Text>{errors.zipCode?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Cidade:</Text>
               <TextInput
                 contentEditable={false}
                 readOnly={true}
-                defaultValue={clientData?.city || ""}
+                value={addressInfo.city ?? 'Aguardando informações...'}
                 style={{ width: '100%', pointerEvents: 'none' }}
               />
             </TextInputContainer>
@@ -291,7 +357,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
               <TextInput
                 contentEditable={false}
                 readOnly={true}
-                defaultValue={clientData?.address || ""}
+                value={addressInfo.address ?? 'Aguardando informações...'}
                 style={{ width: '100%', pointerEvents: 'none' }}
               />
             </TextInputContainer>
@@ -304,25 +370,25 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                 defaultValue={clientData?.addressNumber || ""}
                 style={{ width: '100%' }}
               />
-              {/* {errors.number && (
+              {errors.number && (
                 <FormError>
                   <Text>{errors.number?.message}</Text>
                 </FormError>
-              )} */}
+              )}
             </TextInputContainer>
             <TextInputContainer>
               <Text size="sm" style={{ textAlign: 'left' }}>Estado:</Text>
               <TextInput
                 contentEditable={false}
                 readOnly={true}
-                defaultValue={clientData?.state || ""}
+                value={addressInfo.state ?? 'Aguardando informações...'}
                 style={{ width: '100%', pointerEvents: 'none' }}
               />
             </TextInputContainer>
           </FormDataTelSexo>
           <Line />
           <ButtonContainer>
-            <Button type="button" onClick={() => handleUpdate(clientData)}>
+            <Button type="button" onClick={() => handleUpdate(clientData?.id)}>
               ALTERAR
             </Button>
 

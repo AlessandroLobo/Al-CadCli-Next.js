@@ -4,9 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
 interface UpdateClientData {
-  id: {
-    id: string;
-  };
+  id: string;
   name?: string;
   cpf?: string;
   email?: string;
@@ -27,7 +25,7 @@ export default async function handlerUpdate(req: NextApiRequest, res: NextApiRes
 
   const data: UpdateClientData = req.body;
 
-  console.log('Received data:', data.id.id); // adicionado
+  console.log('Received data:', data); // adicionado
 
   if (!data.id) {
     return res.status(400).json({ message: 'Client ID not specified' });
@@ -36,7 +34,7 @@ export default async function handlerUpdate(req: NextApiRequest, res: NextApiRes
   try {
     const client: Client | null = await prisma.client.findUnique({
       where: {
-        id: data.id.id,
+        id: data.id,
       },
     });
 
@@ -44,9 +42,23 @@ export default async function handlerUpdate(req: NextApiRequest, res: NextApiRes
       return res.status(404).json({ message: 'Client not found' });
     }
 
+    const existingCpf = await prisma.client.findFirst({
+      where: {
+        cpf: data.cpf,
+        NOT: {
+          id: data.id,
+        },
+      },
+    });
+
+
+
+    if (existingCpf) {
+      return res.status(409).json({ message: 'Cpf já cadastrado' })
+    }
     const updatedClient: Client = await prisma.client.update({
       where: {
-        id: data.id.id,
+        id: data.id,
       },
       data: {
         name: data.name ? data.name.toUpperCase() : undefined, // Faz a validação dos dados atualizados

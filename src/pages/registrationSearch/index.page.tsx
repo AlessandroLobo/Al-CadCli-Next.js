@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { getSession, signOut, useSession } from 'next-auth/react'
 import { Session } from 'next-auth'
@@ -36,6 +36,7 @@ export default function RegistrationSearch({ session }: HomeProps) {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [editVisible, setEditVisible] = useState(false); // Estado para controlar a visibilidade do componente RegistrationEdit
   const [selectedClients, setSelectedClients] = useState<any>(null); // Estado para armazenar o cliente selecionado na tabela
+
 
   async function handleSearch() {
     const searchTerm = (document.querySelector('#search-input') as HTMLInputElement)?.value || ''
@@ -106,8 +107,16 @@ export default function RegistrationSearch({ session }: HomeProps) {
           )}
         </ContainerList>
         {editVisible && (
-          <RegistrationEdit clientId={selectedClients} setModalOpen={setEditVisible} />
+          <RegistrationEdit clientId={selectedClients} setModalOpen={(isOpen) => {
+            setEditVisible(isOpen);
+            if (!isOpen) {
+              handleSearch()
+              console.log('Modal foi fechado');
+              // Adicione aqui o código que precisa ser executado quando o modal for fechado
+            }
+          }} />
         )}
+
       </Form>
     </Container>
   )
