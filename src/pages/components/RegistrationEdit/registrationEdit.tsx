@@ -205,7 +205,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
 
       await api.delete('/clientDelete', { data: { id: clientId } });
 
-      alert('Alteração feita');
+      alert('Exclusão feita');
       reset({
         name: '',
         cpf: '',
