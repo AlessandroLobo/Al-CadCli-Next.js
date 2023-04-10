@@ -25,7 +25,7 @@ export default async function handlerUpdate(req: NextApiRequest, res: NextApiRes
 
   const data: UpdateClientData = req.body;
 
-  console.log('Received data:', data); // adicionado
+  console.log('Received data Update:', data); 
 
   if (!data.id) {
     return res.status(400).json({ message: 'Client ID not specified' });

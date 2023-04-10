@@ -47,7 +47,7 @@ export default function RegistrationSearch({ session }: HomeProps) {
   function handleEdit(clientId: string) {
     setSelectedClients(clientId); // Armazena o cliente selecionado na tabela
     setEditVisible(true); // Exibe o componente RegistrationEdit
-    console.log('RegistrationSearch======', clientId)
+    // console.log('RegistrationSearch======', clientId)
   }
 
 

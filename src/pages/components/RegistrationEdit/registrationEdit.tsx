@@ -23,7 +23,7 @@ import { api } from "@/src/lib/axios";
 import { getAddress } from "@/src/hooks/getAddress";
 
 interface Data {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -87,7 +87,6 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
       const zipCode = event.currentTarget.value.replace(/\D/g, '').toUpperCase();
       const addressInfo = await getAddress(zipCode);
 
-      console.log('Endereço retornado pela API:', addressInfo);
 
       if (!addressInfo) {
         setError('Invalid Zip Code');
@@ -96,7 +95,6 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
       // Atualiza o estado com as informações de endereço retornadas pela API
       setAddressInfo(addressInfo);
 
-      console.log('Address Info:', addressInfo); // adicionando novo log
 
       // Re-validate the form fields after updating the address information
     } catch (error) {
@@ -126,7 +124,6 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
         const zipCode = restData.zipCode.replace(/\D/g, '').toUpperCase();
         const addressInfo = await getAddress(zipCode);
 
-        console.log('Endereço retornado pela API:', addressInfo);
 
         if (!addressInfo) {
           setError('Invalid Zip Code');
@@ -144,7 +141,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
     fetchData();
   }, [clientId, reset]);
 
-  
+
 
   function formatBirthdate(birthdate: string) {
     const parts = birthdate.split('/');
@@ -158,11 +155,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
     return `${year}-${month}-${day}`;
   }
 
-  async function handleUpdate(id: number) {
+  async function handleUpdate(id: string) {
     try {
       console.log('Dados enviados para atualização:', id);
       const clientId = id;
-      console.log(clientId);
+      console.log('Função handleUpdate');
 
       // Format birthdate to expected format
       const formattedBirthdate = formatBirthdate(getValues('birthdate'));
@@ -200,6 +197,42 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
     }
   }
 
+  async function handleDelete(id: string) {
+    try {
+      console.log('Função handleDelete');
+      const clientId = id;
+      console.log('Função haldeDelete --- ', clientId)
+
+      await api.delete('/clientDelete', { data: { id: clientId } });
+
+      alert('Alteração feita');
+      reset({
+        name: '',
+        cpf: '',
+        email: '',
+        birthdate: '',
+        phone: '',
+        gender: '',
+        zipCode: '',
+        city: '',
+        address: '',
+        number: '',
+        state: ''
+      });
+      reset()
+      setModalOpen(false);
+      setAddressInfo({ city: '', address: '', state: '' });
+    } catch (err: any) {
+      if (err.response && err.response.status === 404) {
+        setRegisterError('Cliente não encontrado');
+      } else if (err.response && err.response.status === 409) {
+        setRegisterError('CPF já cadastrado');
+      } else {
+        setRegisterError('Ocorreu um erro interno do servidor. Por favor, tente novamente mais tarde.');
+      }
+    }
+  }
+
 
   return (
     <>
@@ -207,7 +240,11 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
         setModalOpenState(false);
         setModalOpen(false);
       }} backDropClose={true}>
-        <Form as="form" onSubmit={handleSubmit(handleUpdate)}>
+        <Form as="form" onSubmit={(event) => {
+          event.preventDefault();
+          handleDelete(clientId);
+          handleUpdate(clientId);
+        }}>
           <label>
             {registerError && (
               <FormError>
@@ -277,7 +314,7 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
                     : ""
                 }
                 style={{ width: '100%' }}
-            
+
               />
               {errors.birthdate && (
                 <FormError>
@@ -388,11 +425,10 @@ export function RegistrationEdit({ clientId, setModalOpen }: RegistrationEditPro
           </FormDataTelSexo>
           <Line />
           <ButtonContainer>
-            <Button type="button" onClick={() => handleUpdate(clientData?.id)}>
+            <Button type="button" onClick={() => clientData && handleUpdate(clientData.id)}>
               ALTERAR
             </Button>
-
-            <Button type="button">
+            <Button type="button" onClick={() => clientData && handleDelete(clientData.id)}>
               EXCLUIR
             </Button>
           </ButtonContainer>
